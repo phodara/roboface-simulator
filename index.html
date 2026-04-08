@@ -169,7 +169,9 @@ const expressionAudio = {
   [EXPR.SURPRISED]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/surprise.mp3'),
   [EXPR.ANXIETY]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/Anxiety.mp3'),
   [EXPR.WACKY]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/whacky.mp3'),
-  [EXPR.SLEEPING]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/sleep.mp3')
+  [EXPR.SLEEPING]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/sleep.mp3'),
+  [EXPR.SAD]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/sad.mp3'),
+  [EXPR.WACKY3D]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/whacky3d.mp3')
 };
 Object.values(expressionAudio).forEach(audio => {
   audio.preload = 'auto';
