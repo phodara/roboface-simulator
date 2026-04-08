@@ -19,46 +19,6 @@
     image-rendering: pixelated;
     border: 2px solid #444;
   }
-  #screen-wrap {
-    position: relative;
-    width: fit-content;
-    padding: 34px 86px;
-  }
-  .touch-point {
-    position: absolute;
-    min-width: 72px;
-    padding: 8px 10px;
-    border: 1px solid #555;
-    border-radius: 8px;
-    background: #101010;
-    color: #ddd;
-    font: 11px monospace;
-    letter-spacing: 1px;
-    text-align: center;
-    touch-action: manipulation;
-    cursor: pointer;
-  }
-  .touch-point:hover,
-  .touch-point:focus {
-    border-color: #0f0;
-    color: #0f0;
-    outline: none;
-  }
-  .touch-point[data-active="true"] {
-    background: #062006;
-    border-color: #0f0;
-    color: #0f0;
-  }
-  .tp-neutral { top: 0; left: 50%; transform: translateX(-50%); }
-  .tp-happy { top: 24px; right: 0; }
-  .tp-angry { top: 21%; right: 0; }
-  .tp-surprised { top: 43%; right: 0; }
-  .tp-anxiety { top: 65%; right: 0; }
-  .tp-wacky { bottom: 24px; right: 0; }
-  .tp-listening { bottom: 0; left: 50%; transform: translateX(-50%); }
-  .tp-sleeping { bottom: 24px; left: 0; }
-  .tp-sad { top: 65%; left: 0; }
-  .tp-wacky3d { top: 43%; left: 0; }
   #controls {
     margin-top: 12px;
     font-size: 12px;
@@ -74,25 +34,14 @@
 </style>
 </head>
 <body>
-<div id="screen-wrap">
-  <canvas id="screen"></canvas>
-  <button class="touch-point tp-neutral" data-expr="NEUTRAL" type="button">NEUTRAL</button>
-  <button class="touch-point tp-happy" data-expr="HAPPY" type="button">HAPPY</button>
-  <button class="touch-point tp-angry" data-expr="ANGRY" type="button">ANGRY</button>
-  <button class="touch-point tp-surprised" data-expr="SURPRISED" type="button">SURPRISE</button>
-  <button class="touch-point tp-anxiety" data-expr="ANXIETY" type="button">ANXIETY</button>
-  <button class="touch-point tp-wacky" data-expr="WACKY" type="button">WACKY</button>
-  <button class="touch-point tp-listening" data-expr="LISTENING" type="button">LISTEN</button>
-  <button class="touch-point tp-sleeping" data-expr="SLEEPING" type="button">SLEEP</button>
-  <button class="touch-point tp-sad" data-expr="SAD" type="button">SAD</button>
-  <button class="touch-point tp-wacky3d" data-expr="WACKY3D" type="button">WACKY3D</button>
-</div>
+<canvas id="screen"></canvas>
 <div id="expr-indicator">NEUTRAL</div>
 <div id="controls">
   Keyboard: <b>1</b>=NEUTRAL &nbsp; <b>2</b>=HAPPY &nbsp; <b>3</b>=ANGRY &nbsp; <b>4</b>=SURPRISED &nbsp; <b>5</b>=ANXIETY<br>
   <b>6</b>=WACKY &nbsp; <b>7</b>=LISTENING &nbsp; <b>8</b>=SLEEPING &nbsp; <b>9</b>=SAD &nbsp; <b>0</b>=WACKY3D &nbsp; <b>B</b>=Blink<br>
   <span style="color:#aaa">WACKY3D: drag to rotate &bull; double-click to resume spin</span>
 </div>
+
 <script>
 // ── Scale & canvas setup ──────────────────────────────────────
 const SCALE = 3;
@@ -132,8 +81,8 @@ const EYE_OX=2, EYE_OY=14, EYE_W=30, EYE_H=18, EYE_R=9;
 const IRIS_W=18, IRIS_H=12, PUP_W=6;
 const MX=92, MY=195, MW=56, MH=64;
 const HX=86, HY=54,  HW=72, HH=82;
-const LEAR_X=56, LEAR_Y=145, LEAR_W=18, LEAR_H=48;
-const REAR_X=166,REAR_Y=145, REAR_W=18, REAR_H=48;
+const LEAR_X=36, LEAR_Y=135, LEAR_W=18, LEAR_H=48;
+const REAR_X=186,REAR_Y=135, REAR_W=18, REAR_H=48;
 const NX=114, NY=183, NW=12, NH=6;
 
 // ── Expressions ───────────────────────────────────────────────
@@ -162,41 +111,6 @@ const W3_SWEEP_PERIOD = 4000;
 
 const startTime = Date.now();
 function millis() { return Date.now() - startTime; }
-
-const anxietyAudio = new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/Anxiety.mp3');
-anxietyAudio.preload = 'auto';
-
-const touchPoints = document.querySelectorAll('.touch-point');
-function setExpression(expr) {
-  if(expr===EXPR.WACKY3D){
-    w3RotY=0;
-    w3SweepStart=millis();
-    w3AutoSpin=true;
-  }
-  if(expr===EXPR.ANXIETY){
-    anxietyAudio.currentTime=0;
-    anxietyAudio.play().catch(() => {});
-  } else {
-    anxietyAudio.pause();
-    anxietyAudio.currentTime=0;
-  }
-  curExpr=expr;
-  document.getElementById('expr-indicator').textContent=EXPR_NAMES[curExpr];
-  touchPoints.forEach(point => {
-    point.dataset.active = point.dataset.expr === EXPR_NAMES[curExpr] ? 'true' : 'false';
-  });
-}
-
-touchPoints.forEach(point => {
-  point.addEventListener('pointerdown', e => {
-    e.preventDefault();
-    setExpression(EXPR[point.dataset.expr]);
-  });
-  point.addEventListener('click', e => {
-    if(e.detail===0) setExpression(EXPR[point.dataset.expr]);
-  });
-});
-setExpression(curExpr);
 
 // ── Off-screen canvases ───────────────────────────────────────
 function makeCtx(w,h) { const c=document.createElement('canvas'); c.width=w; c.height=h; return c.getContext('2d'); }
@@ -304,16 +218,6 @@ function push(mainCtx, x, y, offCtx) {
   mainCtx.drawImage(offCtx.canvas, x*SCALE, y*SCALE, offCtx.canvas.width*SCALE, offCtx.canvas.height*SCALE);
 }
 
-function pushRotated(mainCtx, x, y, offCtx, degrees) {
-  const w=offCtx.canvas.width*SCALE, h=offCtx.canvas.height*SCALE;
-  const cx=x*SCALE+w/2, cy=y*SCALE+h/2;
-  mainCtx.save();
-  mainCtx.translate(cx, cy);
-  mainCtx.rotate(degrees*Math.PI/180);
-  mainCtx.drawImage(offCtx.canvas, -w/2, -h/2, w, h);
-  mainCtx.restore();
-}
-
 // ── Hair ──────────────────────────────────────────────────────
 function drawHair(mainCtx, expr, now) {
   const c=hairCtx; fillScreen(c,C_BG);
@@ -348,7 +252,7 @@ function drawHair(mainCtx, expr, now) {
 }
 
 // ── Ears ──────────────────────────────────────────────────────
-const fx=(x)=>(LEAR_W-1)-x;
+const fx=(x)=>(LEAR_W-1)-x, fy=(y)=>(LEAR_H-1)-y;
 
 function drawEar(mainCtx,rx,ry,isRight,deploy,amp){
   const c=isRight?rEarCtx:lEarCtx;
@@ -357,21 +261,21 @@ function drawEar(mainCtx,rx,ry,isRight,deploy,amp){
   const settle=1-deploy;
   const sway=Math.sin(millis()*0.01+(isRight?0.9:0))*(0.8+amp*8);
   if(!isRight){
-    drawQuadStroke(c,fx(12.5)+sway,4+settle*3,  fx(4)+sway,5+settle*3.5, fx(4)+sway,15.5+settle*2,C_EAR,2);
-    drawQuadStroke(c,fx(4)+sway,   15.5+settle*2,fx(5.5)+sway,30.5,      fx(12)+sway,42,           C_EAR,2);
-    drawQuadStroke(c,fx(12)+sway,  42,           fx(14.5)+sway,44,        fx(15)+sway,40,           C_EAR,1);
-    drawQuadStroke(c,fx(11.5)+sway,7+settle*2,   fx(8.5)+sway,9+settle*2,fx(8.5)+sway,19,          C_EAR_SHADE,1);
-    drawQuadStroke(c,fx(8.5)+sway, 19,           fx(9)+sway,  26,        fx(12.5)+sway,31,         C_EAR_SHADE,1);
-    drawQuadStroke(c,fx(12.5)+sway,31,           fx(14)+sway, 34,        fx(13.5)+sway,37,         C_EAR_SHADE,1);
+    drawQuadStroke(c,fx(12.5)+sway,fy(4+settle*3),  fx(4)+sway,fy(5+settle*3.5), fx(4)+sway,fy(15.5+settle*2),C_EAR,2);
+    drawQuadStroke(c,fx(4)+sway,   fy(15.5+settle*2),fx(5.5)+sway,fy(30.5),      fx(12)+sway,fy(42),           C_EAR,2);
+    drawQuadStroke(c,fx(12)+sway,  fy(42),           fx(14.5)+sway,fy(44),        fx(15)+sway,fy(40),           C_EAR,1);
+    drawQuadStroke(c,fx(11.5)+sway,fy(7+settle*2),   fx(8.5)+sway,fy(9+settle*2),fx(8.5)+sway,fy(19),          C_EAR_SHADE,1);
+    drawQuadStroke(c,fx(8.5)+sway, fy(19),           fx(9)+sway,  fy(26),        fx(12.5)+sway,fy(31),         C_EAR_SHADE,1);
+    drawQuadStroke(c,fx(12.5)+sway,fy(31),           fx(14)+sway, fy(34),        fx(13.5)+sway,fy(37),         C_EAR_SHADE,1);
   } else {
-    drawQuadStroke(c,fx(4.5)+sway, 4+settle*3,  fx(13)+sway,5+settle*3.5, fx(13)+sway,15.5+settle*2,C_EAR,2);
-    drawQuadStroke(c,fx(13)+sway,  15.5+settle*2,fx(11.5)+sway,30.5,      fx(5)+sway,42,            C_EAR,2);
-    drawQuadStroke(c,fx(5)+sway,   42,           fx(2.5)+sway,44,         fx(2)+sway,40,            C_EAR,1);
-    drawQuadStroke(c,fx(5.5)+sway, 7+settle*2,   fx(8.5)+sway,9+settle*2, fx(8.5)+sway,19,         C_EAR_SHADE,1);
-    drawQuadStroke(c,fx(8.5)+sway, 19,           fx(8)+sway,  26,         fx(4.5)+sway,31,         C_EAR_SHADE,1);
-    drawQuadStroke(c,fx(4.5)+sway, 31,           fx(3)+sway,  34,         fx(3.5)+sway,37,         C_EAR_SHADE,1);
+    drawQuadStroke(c,fx(4.5)+sway, fy(4+settle*3),  fx(13)+sway,fy(5+settle*3.5), fx(13)+sway,fy(15.5+settle*2),C_EAR,2);
+    drawQuadStroke(c,fx(13)+sway,  fy(15.5+settle*2),fx(11.5)+sway,fy(30.5),      fx(5)+sway,fy(42),            C_EAR,2);
+    drawQuadStroke(c,fx(5)+sway,   fy(42),           fx(2.5)+sway,fy(44),         fx(2)+sway,fy(40),            C_EAR,1);
+    drawQuadStroke(c,fx(5.5)+sway, fy(7+settle*2),   fx(8.5)+sway,fy(9+settle*2), fx(8.5)+sway,fy(19),         C_EAR_SHADE,1);
+    drawQuadStroke(c,fx(8.5)+sway, fy(19),           fx(8)+sway,  fy(26),         fx(4.5)+sway,fy(31),         C_EAR_SHADE,1);
+    drawQuadStroke(c,fx(4.5)+sway, fy(31),           fx(3)+sway,  fy(34),         fx(3.5)+sway,fy(37),         C_EAR_SHADE,1);
   }
-  pushRotated(mainCtx,rx,ry,c,isRight?20:-20);
+  push(mainCtx,rx,ry,c);
 }
 
 // ── Spiral eye (ANXIETY) ──────────────────────────────────────
@@ -503,48 +407,6 @@ function sampleMouth(shape,t,amp){
   }
 }
 
-function drawForwardTongue(c, now, baseX, baseY) {
-  const phase=now*0.002;
-  const wave=Math.sin(phase);
-  const tipX=baseX;
-  const tipY=baseY+24+wave*4.2;
-  const baseW=9, midW=15, tipW=23, tipH=12;
-
-  c.fillStyle=C_TONGUE;
-  c.beginPath();
-  c.moveTo(baseX-baseW/2,baseY);
-  c.bezierCurveTo(baseX-midW/2,baseY+8,tipX-tipW/2,tipY-9,tipX-tipW/2,tipY);
-  c.bezierCurveTo(tipX-tipW/2,tipY+tipH/2,tipX-tipW*0.25,tipY+tipH,tipX,tipY+tipH);
-  c.bezierCurveTo(tipX+tipW*0.25,tipY+tipH,tipX+tipW/2,tipY+tipH/2,tipX+tipW/2,tipY);
-  c.bezierCurveTo(tipX+tipW/2,tipY-9,baseX+midW/2,baseY+8,baseX+baseW/2,baseY);
-  c.closePath();
-  c.fill();
-
-  c.strokeStyle=C_TONGUE_DIM;
-  c.lineWidth=1;
-  c.beginPath();
-  c.moveTo(baseX,baseY+3);
-  c.bezierCurveTo(baseX,baseY+10+wave*1.5,tipX,tipY+1-wave*1.2,tipX,tipY+tipH-3);
-  c.stroke();
-  fillCircle(c,tipX-4,tipY+3,1,C_TONGUE_DIM);
-}
-
-function drawWackyTeethMouth(c) {
-  const cx=MW/2, gapY=31;
-  const toothW=4, toothH=8, step=7;
-  for(let i=-3;i<=3;i++){
-    const x=Math.round(cx+i*step-toothW/2);
-    const smile=Math.abs(i)*2.2;
-    fillRect(c,x,Math.round(gapY-8-smile),toothW,toothH,C_FACE_FG);
-    fillRect(c,x,Math.round(gapY+6-smile),toothW,toothH,C_FACE_FG);
-  }
-
-  // Central black opening between upper/lower jaws; WACKY3D tongue roots here.
-  fillRect(c,cx-12,gapY-2,24,9,C_BG);
-  fillRect(c,cx-21,gapY-7,8,8,C_BG);
-  fillRect(c,cx+13,gapY-7,8,8,C_BG);
-}
-
 // ── Mouth region ──────────────────────────────────────────────
 function drawMouth(mainCtx,expr,amp,opts={}){
   const c=mouthCtx; fillScreen(c,C_BG);
@@ -619,13 +481,6 @@ function drawMouth(mainCtx,expr,amp,opts={}){
     push(mainCtx,MX,MY,c); return;
   }
 
-  // WACKY: toothy grin with a small central opening for the tongue.
-  if(expr===EXPR.WACKY){
-    drawWackyTeethMouth(c);
-    if(!opts.skipTongue && tongueOut) drawForwardTongue(c, now, MW/2, iY+27);
-    push(mainCtx,MX,MY,c); return;
-  }
-
   // Standard morphing mouth
   const hpulse=(expr===EXPR.HAPPY)?(1+0.2*Math.sin(now*0.002)):1;
   const hcx=iX+iW*0.5;
@@ -660,7 +515,30 @@ function drawMouth(mainCtx,expr,amp,opts={}){
 
   // Tongue (WACKY, SURPRISED, SLEEPING, ANXIETY, SAD — not HAPPY/ANGRY/LISTENING/NEUTRAL)
   if(!opts.skipTongue && tongueOut && expr!==EXPR.HAPPY && expr!==EXPR.ANGRY && expr!==EXPR.LISTENING && expr!==EXPR.NEUTRAL){
-    drawForwardTongue(c, now, MW/2, iY+27);
+    const phase=now*0.002;
+    const wave=Math.sin(phase);
+    const baseX=MW/2, baseY=iY+27;
+    const tipX=baseX;
+    const tipY=baseY+24+wave*4.2;
+    const baseW=9, midW=15, tipW=23, tipH=12;
+
+    c.fillStyle=C_TONGUE;
+    c.beginPath();
+    c.moveTo(baseX-baseW/2,baseY);
+    c.bezierCurveTo(baseX-midW/2,baseY+8,tipX-tipW/2,tipY-9,tipX-tipW/2,tipY);
+    c.bezierCurveTo(tipX-tipW/2,tipY+tipH/2,tipX-tipW*0.25,tipY+tipH,tipX,tipY+tipH);
+    c.bezierCurveTo(tipX+tipW*0.25,tipY+tipH,tipX+tipW/2,tipY+tipH/2,tipX+tipW/2,tipY);
+    c.bezierCurveTo(tipX+tipW/2,tipY-9,baseX+midW/2,baseY+8,baseX+baseW/2,baseY);
+    c.closePath();
+    c.fill();
+
+    c.strokeStyle=C_TONGUE_DIM;
+    c.lineWidth=1;
+    c.beginPath();
+    c.moveTo(baseX,baseY+3);
+    c.bezierCurveTo(baseX,baseY+10+wave*1.5,tipX,tipY+1-wave*1.2,tipX,tipY+tipH-3);
+    c.stroke();
+    fillCircle(c,tipX-4,tipY+3,1,C_TONGUE_DIM);
   }
 
   push(mainCtx,MX,MY,c);
@@ -939,21 +817,19 @@ function drawWacky3DTongue(mainCtx, plane) {
   });
   const root = mapPlane((MX + MW * 0.5) / SCREEN_W, (MY + 31) / SCREEN_H);
   const turn=Math.abs(plane.rotNorm);
-  const tipBob=wave * 8;
-  const curl=wave * 2;
-  const frontRoll=wave < 0 ? wave * 12 : wave * 10;
+  const tipBob=wave * 7;
+  const curl=wave * 5;
   const baseW=5*SCALE;
   const midW=9*SCALE;
   const tipW=(15 - turn * 1.5)*SCALE;
   const tipH=8*SCALE;
   const tipMarginX=tipW/SCALE*0.6;
-  const tipMarginY=tipH/SCALE+Math.abs(curl)+Math.abs(frontRoll)+2;
+  const tipMarginY=tipH/SCALE+Math.abs(curl)+2;
   const rootMarginX=baseW/SCALE*0.5;
   root.x=clamp(root.x,rootMarginX,SCREEN_W-rootMarginX);
   root.y=clamp(root.y,0,SCREEN_H-tipMarginY-16);
   const tipX=clamp(root.x + plane.rotNorm * 6.5,tipMarginX,SCREEN_W-tipMarginX);
   const tipY=clamp(root.y + 15 + tipBob,0,SCREEN_H-tipMarginY);
-  const frontY=tipY+tipH/SCALE+frontRoll;
 
   mainCtx.save();
   mainCtx.strokeStyle=C_BG;
@@ -966,13 +842,13 @@ function drawWacky3DTongue(mainCtx, plane) {
     (tipX-tipW/SCALE*0.5)*SCALE, tipY*SCALE
   );
   mainCtx.bezierCurveTo(
-    (tipX-tipW/SCALE*0.58)*SCALE, (tipY+tipH/SCALE*0.65-curl*0.15)*SCALE,
-    (tipX-tipW/SCALE*0.44)*SCALE, (frontY+3-curl*0.2)*SCALE,
-    tipX*SCALE, (frontY+3)*SCALE
+    (tipX-tipW/SCALE*0.55)*SCALE, (tipY+tipH/SCALE*0.55-curl*0.35)*SCALE,
+    (tipX-tipW/SCALE*0.25)*SCALE, (tipY+tipH/SCALE-curl)*SCALE,
+    tipX*SCALE, (tipY+tipH/SCALE)*SCALE
   );
   mainCtx.bezierCurveTo(
-    (tipX+tipW/SCALE*0.44)*SCALE, (frontY+3+curl*0.2)*SCALE,
-    (tipX+tipW/SCALE*0.58)*SCALE, (tipY+tipH/SCALE*0.65+curl*0.15)*SCALE,
+    (tipX+tipW/SCALE*0.25)*SCALE, (tipY+tipH/SCALE+curl)*SCALE,
+    (tipX+tipW/SCALE*0.55)*SCALE, (tipY+tipH/SCALE*0.55+curl*0.35)*SCALE,
     (tipX+tipW/SCALE*0.5)*SCALE, tipY*SCALE
   );
   mainCtx.bezierCurveTo(
@@ -992,13 +868,13 @@ function drawWacky3DTongue(mainCtx, plane) {
     (tipX-tipW/SCALE*0.5)*SCALE, tipY*SCALE
   );
   mainCtx.bezierCurveTo(
-    (tipX-tipW/SCALE*0.58)*SCALE, (tipY+tipH/SCALE*0.65-curl*0.15)*SCALE,
-    (tipX-tipW/SCALE*0.44)*SCALE, (frontY+3-curl*0.2)*SCALE,
-    tipX*SCALE, (frontY+3)*SCALE
+    (tipX-tipW/SCALE*0.55)*SCALE, (tipY+tipH/SCALE*0.55-curl*0.35)*SCALE,
+    (tipX-tipW/SCALE*0.25)*SCALE, (tipY+tipH/SCALE-curl)*SCALE,
+    tipX*SCALE, (tipY+tipH/SCALE)*SCALE
   );
   mainCtx.bezierCurveTo(
-    (tipX+tipW/SCALE*0.44)*SCALE, (frontY+3+curl*0.2)*SCALE,
-    (tipX+tipW/SCALE*0.58)*SCALE, (tipY+tipH/SCALE*0.65+curl*0.15)*SCALE,
+    (tipX+tipW/SCALE*0.25)*SCALE, (tipY+tipH/SCALE+curl)*SCALE,
+    (tipX+tipW/SCALE*0.55)*SCALE, (tipY+tipH/SCALE*0.55+curl*0.35)*SCALE,
     (tipX+tipW/SCALE*0.5)*SCALE, tipY*SCALE
   );
   mainCtx.bezierCurveTo(
@@ -1014,12 +890,11 @@ function drawWacky3DTongue(mainCtx, plane) {
   mainCtx.beginPath();
   mainCtx.moveTo(root.x*SCALE, (root.y+2)*SCALE);
   mainCtx.bezierCurveTo(
-    root.x*SCALE, (root.y+6.5+wave*0.8)*SCALE,
-    tipX*SCALE, (tipY+4+tipBob*0.1)*SCALE,
-    tipX*SCALE, (frontY+2.5)*SCALE
+    root.x*SCALE, (root.y+6.5+wave*1.2)*SCALE,
+    tipX*SCALE, (tipY+2+tipBob*0.35)*SCALE,
+    tipX*SCALE, (tipY+tipH/SCALE-4)*SCALE
   );
   mainCtx.stroke();
-
   mainCtx.restore();
 }
 
@@ -1031,7 +906,13 @@ document.addEventListener('keydown', e => {
              '5':EXPR.ANXIETY,'6':EXPR.WACKY,'7':EXPR.LISTENING,'8':EXPR.SLEEPING,
              '9':EXPR.SAD,'0':EXPR.WACKY3D};
   if(map[e.key]!==undefined){
-    setExpression(map[e.key]);
+    if(map[e.key]===EXPR.WACKY3D){
+      w3RotY=0;
+      w3SweepStart=millis();
+      w3AutoSpin=true;
+    }
+    curExpr=map[e.key];
+    document.getElementById('expr-indicator').textContent=EXPR_NAMES[curExpr];
   }
   if(e.key==='b'||e.key==='B'){ eyeOpen=false; blinkEndTime=millis()+300; }
 });
