@@ -17,22 +17,22 @@
   }
   canvas {
     image-rendering: pixelated;
-    border: 2px solid #444;
+    border: 1px solid #444;
   }
   #screen-wrap {
     position: relative;
     width: fit-content;
-    padding: 34px 86px;
+    padding: 17px 43px;
   }
   .touch-point {
     position: absolute;
-    min-width: 72px;
-    padding: 8px 10px;
+    min-width: 36px;
+    padding: 4px 5px;
     border: 1px solid #555;
-    border-radius: 8px;
+    border-radius: 4px;
     background: #101010;
     color: #ddd;
-    font: 11px monospace;
+    font: 6px monospace;
     letter-spacing: 1px;
     text-align: center;
     touch-action: manipulation;
@@ -50,24 +50,24 @@
     color: #0f0;
   }
   .tp-neutral { top: 0; left: 50%; transform: translateX(-50%); }
-  .tp-happy { top: 24px; right: 0; }
+  .tp-happy { top: 12px; right: 0; }
   .tp-angry { top: 21%; right: 0; }
   .tp-surprised { top: 43%; right: 0; }
   .tp-anxiety { top: 65%; right: 0; }
-  .tp-wacky { bottom: 24px; right: 0; }
+  .tp-wacky { bottom: 12px; right: 0; }
   .tp-listening { bottom: 0; left: 50%; transform: translateX(-50%); }
-  .tp-sleeping { bottom: 24px; left: 0; }
+  .tp-sleeping { bottom: 12px; left: 0; }
   .tp-sad { top: 65%; left: 0; }
   .tp-wacky3d { top: 43%; left: 0; }
   #controls {
-    margin-top: 12px;
-    font-size: 12px;
+    margin-top: 6px;
+    font-size: 6px;
     text-align: center;
     line-height: 1.8;
   }
   #expr-indicator {
-    margin-top: 8px;
-    font-size: 14px;
+    margin-top: 4px;
+    font-size: 7px;
     color: #0f0;
     letter-spacing: 2px;
   }
@@ -95,7 +95,7 @@
 </div>
 <script>
 // ── Scale & canvas setup ──────────────────────────────────────
-const SCALE = 3;
+const SCALE = 1.5;
 const SCREEN_W = 240;
 const SCREEN_H = 320;
 
@@ -163,8 +163,24 @@ const W3_SWEEP_PERIOD = 4000;
 const startTime = Date.now();
 function millis() { return Date.now() - startTime; }
 
-const anxietyAudio = new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/Anxiety.mp3');
-anxietyAudio.preload = 'auto';
+const expressionAudio = {
+  [EXPR.HAPPY]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/happy.mp3'),
+  [EXPR.ANGRY]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/angry.mp3'),
+  [EXPR.SURPRISED]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/surprise.mp3'),
+  [EXPR.ANXIETY]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/Anxiety.mp3'),
+  [EXPR.WACKY]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/whacky.mp3'),
+  [EXPR.SLEEPING]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/sleep.mp3')
+};
+Object.values(expressionAudio).forEach(audio => {
+  audio.preload = 'auto';
+});
+
+function stopExpressionAudio() {
+  Object.values(expressionAudio).forEach(audio => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
+}
 
 const touchPoints = document.querySelectorAll('.touch-point');
 function setExpression(expr) {
@@ -173,12 +189,9 @@ function setExpression(expr) {
     w3SweepStart=millis();
     w3AutoSpin=true;
   }
-  if(expr===EXPR.ANXIETY){
-    anxietyAudio.currentTime=0;
-    anxietyAudio.play().catch(() => {});
-  } else {
-    anxietyAudio.pause();
-    anxietyAudio.currentTime=0;
+  stopExpressionAudio();
+  if(expressionAudio[expr]){
+    expressionAudio[expr].play().catch(() => {});
   }
   curExpr=expr;
   document.getElementById('expr-indicator').textContent=EXPR_NAMES[curExpr];
