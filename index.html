@@ -2,27 +2,45 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RobotFace Simulator</title>
 <style>
+  :root {
+    --canvas-width: 360px;
+    --canvas-height: 480px;
+  }
   body {
     background: #1a1a1a;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     min-height: 100vh;
     margin: 0;
+    padding: 12px;
+    box-sizing: border-box;
     font-family: monospace;
     color: #ccc;
   }
   canvas {
+    display: block;
+    width: 100%;
+    max-width: var(--canvas-width);
+    height: auto;
+    aspect-ratio: 3 / 4;
     image-rendering: pixelated;
     border: 1px solid #444;
+    box-sizing: border-box;
   }
   #screen-wrap {
     position: relative;
-    width: fit-content;
+    width: min(100%, 446px);
     padding: 17px 43px;
+    box-sizing: border-box;
+  }
+  #touch-points {
+    position: absolute;
+    inset: 0;
   }
   .touch-point {
     position: absolute;
@@ -59,40 +77,74 @@
   .tp-sleeping { bottom: 12px; left: 0; }
   .tp-sad { top: 65%; left: 0; }
   .tp-wacky3d { top: 43%; left: 0; }
-  #controls {
-    margin-top: 6px;
-    font-size: 6px;
-    text-align: center;
-    line-height: 1.8;
-  }
   #expr-indicator {
     margin-top: 4px;
     font-size: 7px;
     color: #0f0;
     letter-spacing: 2px;
   }
+  #copyright {
+    margin-top: 10px;
+    font-size: 8px;
+    color: #888;
+    text-align: center;
+    letter-spacing: 1px;
+  }
+  @media (max-width: 520px) {
+    body {
+      min-height: auto;
+      justify-content: flex-start;
+    }
+    #screen-wrap {
+      width: min(100%, var(--canvas-width));
+      padding: 0;
+    }
+    #touch-points {
+      position: static;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .touch-point {
+      position: static;
+      min-width: 0;
+      width: 100%;
+      font-size: 10px;
+      padding: 8px 6px;
+      transform: none;
+    }
+    #expr-indicator {
+      font-size: 10px;
+      letter-spacing: 1px;
+    }
+    #copyright {
+      font-size: 10px;
+      letter-spacing: 0.5px;
+    }
+  }
 </style>
 </head>
 <body>
 <div id="screen-wrap">
   <canvas id="screen"></canvas>
-  <button class="touch-point tp-neutral" data-expr="NEUTRAL" type="button">NEUTRAL</button>
-  <button class="touch-point tp-happy" data-expr="HAPPY" type="button">HAPPY</button>
-  <button class="touch-point tp-angry" data-expr="ANGRY" type="button">ANGRY</button>
-  <button class="touch-point tp-surprised" data-expr="SURPRISED" type="button">SURPRISE</button>
-  <button class="touch-point tp-anxiety" data-expr="ANXIETY" type="button">ANXIETY</button>
-  <button class="touch-point tp-wacky" data-expr="WACKY" type="button">WACKY</button>
-  <button class="touch-point tp-listening" data-expr="LISTENING" type="button">LISTEN</button>
-  <button class="touch-point tp-sleeping" data-expr="SLEEPING" type="button">SLEEP</button>
-  <button class="touch-point tp-sad" data-expr="SAD" type="button">SAD</button>
-  <button class="touch-point tp-wacky3d" data-expr="WACKY3D" type="button">WACKY3D</button>
+  <div id="touch-points">
+    <button class="touch-point tp-neutral" data-expr="NEUTRAL" type="button">NEUTRAL</button>
+    <button class="touch-point tp-happy" data-expr="HAPPY" type="button">HAPPY</button>
+    <button class="touch-point tp-angry" data-expr="ANGRY" type="button">ANGRY</button>
+    <button class="touch-point tp-surprised" data-expr="SURPRISED" type="button">SURPRISE</button>
+    <button class="touch-point tp-anxiety" data-expr="ANXIETY" type="button">ANXIETY</button>
+    <button class="touch-point tp-wacky" data-expr="WACKY" type="button">WACKY</button>
+    <button class="touch-point tp-listening" data-expr="LISTENING" type="button">LISTEN</button>
+    <button class="touch-point tp-sleeping" data-expr="SLEEPING" type="button">SLEEP</button>
+    <button class="touch-point tp-sad" data-expr="SAD" type="button">SAD</button>
+    <button class="touch-point tp-wacky3d" data-expr="WACKY3D" type="button">WACKY3D</button>
+  </div>
 </div>
 <div id="expr-indicator">NEUTRAL</div>
 <div id="controls">
-  Keyboard: <b>1</b>=NEUTRAL &nbsp; <b>2</b>=HAPPY &nbsp; <b>3</b>=ANGRY &nbsp; <b>4</b>=SURPRISED &nbsp; <b>5</b>=ANXIETY<br>
-  <b>6</b>=WACKY &nbsp; <b>7</b>=LISTENING &nbsp; <b>8</b>=SLEEPING &nbsp; <b>9</b>=SAD &nbsp; <b>0</b>=WACKY3D &nbsp; <b>B</b>=Blink<br>
-  <span style="color:#aaa">WACKY3D: drag to rotate &bull; double-click to resume spin</span>
 </div>
+<div id="copyright">&copy; 2026 Paul Hodara. All rights reserved.</div>
 <script>
 // ── Scale & canvas setup ──────────────────────────────────────
 const SCALE = 1.5;
@@ -102,8 +154,6 @@ const SCREEN_H = 320;
 const mainCanvas = document.getElementById('screen');
 mainCanvas.width  = SCREEN_W * SCALE;
 mainCanvas.height = SCREEN_H * SCALE;
-mainCanvas.style.width  = (SCREEN_W * SCALE) + 'px';
-mainCanvas.style.height = (SCREEN_H * SCALE) + 'px';
 
 // ── RGB565 colour helpers ─────────────────────────────────────
 function rgb565(c) {
