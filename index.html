@@ -17,7 +17,7 @@
     justify-content: flex-start;
     min-height: 100vh;
     margin: 0;
-    padding: 12px;
+    padding: 12px 12px 28px;
     box-sizing: border-box;
     font-family: monospace;
     color: #ccc;
@@ -67,22 +67,16 @@
     border-color: #0f0;
     color: #0f0;
   }
-  .tp-neutral { top: 0; left: 50%; transform: translateX(-50%); }
-  .tp-happy { top: 12px; right: 0; }
-  .tp-angry { top: 21%; right: 0; }
-  .tp-surprised { top: 43%; right: 0; }
-  .tp-anxiety { top: 65%; right: 0; }
-  .tp-wacky { bottom: 12px; right: 0; }
-  .tp-listening { bottom: 0; left: 50%; transform: translateX(-50%); }
-  .tp-sleeping { bottom: 12px; left: 0; }
-  .tp-sad { top: 65%; left: 0; }
-  .tp-wacky3d { top: 43%; left: 0; }
-  #expr-indicator {
-    margin-top: 4px;
-    font-size: 7px;
-    color: #0f0;
-    letter-spacing: 2px;
-  }
+  .tp-neutral { top: 12px; left: 50%; transform: translateX(-50%); }
+  .tp-happy { top: 24px; right: 36px; }
+  .tp-angry { top: 26%; right: 36px; }
+  .tp-surprised { top: 46%; right: 36px; }
+  .tp-anxiety { top: 63%; right: 36px; }
+  .tp-wacky { bottom: 24px; right: 36px; }
+  .tp-listening { bottom: 12px; left: 50%; transform: translateX(-50%); }
+  .tp-sleeping { bottom: 24px; left: 36px; }
+  .tp-sad { top: 63%; left: 36px; }
+  .tp-wacky3d { top: 46%; left: 36px; }
   #copyright {
     margin-top: 10px;
     font-size: 8px;
@@ -94,29 +88,23 @@
     body {
       min-height: auto;
       justify-content: flex-start;
+      padding-bottom: 40px;
     }
     #screen-wrap {
       width: min(100%, var(--canvas-width));
-      padding: 0;
+      padding: 17px 43px;
     }
     #touch-points {
-      position: static;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      margin-top: 10px;
+      position: absolute;
+      inset: 0;
+      display: block;
     }
     .touch-point {
-      position: static;
-      min-width: 0;
-      width: 100%;
-      font-size: 10px;
-      padding: 8px 6px;
-      transform: none;
-    }
-    #expr-indicator {
-      font-size: 10px;
-      letter-spacing: 1px;
+      position: absolute;
+      min-width: 34px;
+      width: auto;
+      font-size: 6px;
+      padding: 4px 5px;
     }
     #copyright {
       font-size: 10px;
@@ -141,7 +129,6 @@
     <button class="touch-point tp-wacky3d" data-expr="WACKY3D" type="button">WACKY3D</button>
   </div>
 </div>
-<div id="expr-indicator">NEUTRAL</div>
 <div id="controls">
 </div>
 <div id="copyright">&copy; 2026 Paul Hodara. All rights reserved.</div>
@@ -219,6 +206,7 @@ const expressionAudio = {
   [EXPR.SURPRISED]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/surprise.mp3'),
   [EXPR.ANXIETY]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/Anxiety.mp3'),
   [EXPR.WACKY]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/whacky.mp3'),
+  [EXPR.LISTENING]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/listening.mp3'),
   [EXPR.SLEEPING]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/sleep.mp3'),
   [EXPR.SAD]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/sad.mp3'),
   [EXPR.WACKY3D]: new Audio('https://raw.githubusercontent.com/phodara/roboface-audio/main/whacky3d.mp3')
@@ -226,6 +214,7 @@ const expressionAudio = {
 Object.values(expressionAudio).forEach(audio => {
   audio.preload = 'auto';
 });
+expressionAudio[EXPR.LISTENING].loop = true;
 
 function stopExpressionAudio() {
   Object.values(expressionAudio).forEach(audio => {
@@ -246,7 +235,6 @@ function setExpression(expr) {
     expressionAudio[expr].play().catch(() => {});
   }
   curExpr=expr;
-  document.getElementById('expr-indicator').textContent=EXPR_NAMES[curExpr];
   touchPoints.forEach(point => {
     point.dataset.active = point.dataset.expr === EXPR_NAMES[curExpr] ? 'true' : 'false';
   });
