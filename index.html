@@ -78,6 +78,7 @@
   .tp-sleeping { bottom: 24px; left: 36px; }
   .tp-sad { top: 63%; left: 36px; }
   .tp-wacky3d { top: 46%; left: 36px; }
+  .tp-love { top: 24px; left: 36px; }
   #copyright {
     margin-top: 10px;
     font-size: 8px;
@@ -129,6 +130,7 @@
     <button class="touch-point tp-sleeping" data-expr="SLEEPING" type="button">SLEEP</button>
     <button class="touch-point tp-sad" data-expr="SAD" type="button">SAD</button>
     <button class="touch-point tp-wacky3d" data-expr="WACKY3D" type="button">WACKY3D</button>
+    <button class="touch-point tp-love" data-expr="LOVING" type="button">LOVING</button>
   </div>
 </div>
 <div id="controls">
@@ -176,8 +178,8 @@ const REAR_X=166,REAR_Y=145, REAR_W=18, REAR_H=48;
 const NX=114, NY=183, NW=12, NH=6;
 
 // ── Expressions ───────────────────────────────────────────────
-const EXPR = { NEUTRAL:0,HAPPY:1,ANGRY:2,SURPRISED:3,ANXIETY:4,WACKY:5,LISTENING:6,SLEEPING:7,SAD:8,WACKY3D:9 };
-const EXPR_NAMES = ['NEUTRAL','HAPPY','ANGRY','SURPRISED','ANXIETY','WACKY','LISTENING','SLEEPING','SAD','WACKY3D'];
+const EXPR = { NEUTRAL:0,HAPPY:1,ANGRY:2,SURPRISED:3,ANXIETY:4,WACKY:5,LISTENING:6,SLEEPING:7,SAD:8,WACKY3D:9,LOVING:10 };
+const EXPR_NAMES = ['NEUTRAL','HAPPY','ANGRY','SURPRISED','ANXIETY','WACKY','LISTENING','SLEEPING','SAD','WACKY3D','LOVING'];
 
 // ── State ─────────────────────────────────────────────────────
 let curExpr = EXPR.NEUTRAL;
@@ -326,6 +328,46 @@ function drawBrow(c,x0,x1,baseY,tilt,col) {
   }
 }
 
+function heartPoints(cx,cy,size){
+  const w=size;
+  const h=Math.round(size*0.92);
+  return [
+    [cx, cy+h],
+    [cx-w, cy+1],
+    [cx-w, cy-h+2],
+    [cx-Math.round(w*0.42), cy-h],
+    [cx, cy-Math.round(h*0.35)],
+    [cx+Math.round(w*0.42), cy-h],
+    [cx+w, cy-h+2],
+    [cx+w, cy+1]
+  ];
+}
+
+function fillHeart(c,cx,cy,size,col) {
+  const pts=heartPoints(cx,cy,size);
+  c.fillStyle=col;
+  c.beginPath();
+  c.moveTo(pts[0][0],pts[0][1]);
+  c.lineTo(pts[1][0],pts[1][1]);
+  c.quadraticCurveTo(pts[2][0],pts[2][1],pts[4][0],pts[4][1]);
+  c.quadraticCurveTo(pts[6][0],pts[6][1],pts[7][0],pts[7][1]);
+  c.closePath();
+  c.fill();
+}
+
+function drawHeart(c,cx,cy,size,col,lineWidth) {
+  const pts=heartPoints(cx,cy,size);
+  c.strokeStyle=col;
+  c.lineWidth=lineWidth || 1;
+  c.beginPath();
+  c.moveTo(pts[0][0],pts[0][1]);
+  c.lineTo(pts[1][0],pts[1][1]);
+  c.quadraticCurveTo(pts[2][0],pts[2][1],pts[4][0],pts[4][1]);
+  c.quadraticCurveTo(pts[6][0],pts[6][1],pts[7][0],pts[7][1]);
+  c.closePath();
+  c.stroke();
+}
+
 function drawNose(ctx) {
   const cx=(NX+Math.floor(NW/2))*SCALE;
   const topY=(NY-3)*SCALE;
@@ -463,6 +505,7 @@ function drawEye(mainCtx,rx,ry,expr,open,scan,vscan,isLeft){
     case EXPR.ANXIETY:  drawBrow(c,bx0+3,bx1-3,browY-2+(isLeft?1:-1),isLeft?5:-5,C_ACCENT_Y); break;
     case EXPR.WACKY:    drawBrow(c,bx0+4,bx1-4,browY+(isLeft?5:1),  0,           C_ACCENT_Y_DIM); break;
     case EXPR.SAD:      drawBrow(c,bx0,  bx1,  browY,   isLeft?7:-7, C_ACCENT_Y_DIM); break;
+    case EXPR.LOVING:   drawBrow(c,bx0+5,bx1-5,browY+2, 0,           C_ACCENT_Y_DIM); break;
     default:            drawBrow(c,bx0+4,bx1-4,browY+1, 0,           C_ACCENT_Y_DIM); break;
   }
 
@@ -498,6 +541,14 @@ function drawEye(mainCtx,rx,ry,expr,open,scan,vscan,isLeft){
   // Sleeping
   if(expr===EXPR.SLEEPING){
     drawHLine(c,ex+4,ey+Math.floor(EYE_H/2),EYE_W-8,C_FACE_FG);
+    push(mainCtx,rx,ry,c); return;
+  }
+
+  if(expr===EXPR.LOVING){
+    const hx=ex+Math.floor(EYE_W/2);
+    const hy=ey+Math.floor(EYE_H/2)+2;
+    fillHeart(c,hx,hy,8,C_BG);
+    drawHeart(c,hx,hy,8,C_NOSE,2);
     push(mainCtx,rx,ry,c); return;
   }
 
@@ -612,7 +663,7 @@ function drawMouth(mainCtx,expr,amp,opts={}){
   morph=morph*morph*(3-2*morph); // easeInOut
 
   let rCur=mouthShapeCur, rNext=mouthShapeNext;
-  if(expr===EXPR.HAPPY){ rCur=0; rNext=0; morph=1; }
+  if(expr===EXPR.HAPPY || expr===EXPR.LOVING){ rCur=0; rNext=0; morph=1; }
 
   fillRoundRect(c,0,0,MW,MH,Math.floor(MH/2),C_BG);
 
@@ -671,6 +722,25 @@ function drawMouth(mainCtx,expr,amp,opts={}){
       if(i>0){ fillTriangle(c,px,pt,x,top,px,pb,C_FACE_FG); fillTriangle(c,x,top,x,bot,px,pb,C_FACE_FG); drawLine(c,px,pm,x,mid,C_FACE_DIM); }
       px=x; pm=mid; pt=top; pb=bot;
     }
+    push(mainCtx,MX,MY,c); return;
+  }
+
+  if(expr===EXPR.LOVING){
+    const kiss=Math.sin(now*0.006);
+    const lipW=24+Math.round(kiss*4);
+    const lipH=20+Math.round(kiss*3);
+    const lipX=Math.floor(MW/2-lipW/2);
+    const lipY=bY-6-Math.round(kiss);
+    const innerW=Math.max(6,lipW-20-Math.round(kiss*2));
+    const innerH=Math.max(8,lipH-8+Math.round(kiss*2));
+    const innerX=Math.floor(MW/2-innerW/2);
+    const innerY=lipY+4;
+    fillVCapsule(c,lipX+6,lipY,lipW-12,lipH,C_NOSE);
+    fillCircle(c,lipX+8,lipY+6,5+Math.round(kiss),C_NOSE);
+    fillCircle(c,lipX+lipW-8,lipY+6,5+Math.round(kiss),C_NOSE);
+    fillVCapsule(c,innerX,innerY,innerW,innerH,C_BG);
+    drawCircle(c,Math.floor(MW/2),lipY+10,4,C_TONGUE_DIM);
+    drawHLine(c,lipX+7,lipY+10,lipW-14,C_TONGUE_DIM);
     push(mainCtx,MX,MY,c); return;
   }
 
@@ -1073,7 +1143,7 @@ function loop(){ update(); render(); requestAnimationFrame(loop); }
 document.addEventListener('keydown', e => {
   const map={'1':EXPR.NEUTRAL,'2':EXPR.HAPPY,'3':EXPR.ANGRY,'4':EXPR.SURPRISED,
              '5':EXPR.ANXIETY,'6':EXPR.WACKY,'7':EXPR.LISTENING,'8':EXPR.SLEEPING,
-             '9':EXPR.SAD,'0':EXPR.WACKY3D};
+             '9':EXPR.SAD,'0':EXPR.WACKY3D,'l':EXPR.LOVING,'L':EXPR.LOVING};
   if(map[e.key]!==undefined){
     setExpression(map[e.key]);
   }
