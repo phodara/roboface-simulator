@@ -6,8 +6,8 @@
 <title>RobotFace Simulator</title>
 <style>
   :root {
-    --canvas-width: 360px;
-    --canvas-height: 480px;
+    --canvas-width: 414px;
+    --canvas-height: 552px;
   }
   body {
     background: #1a1a1a;
@@ -34,7 +34,7 @@
   }
   #screen-wrap {
     position: relative;
-    width: min(100%, 446px);
+    width: min(100%, 513px);
     padding: 17px 43px;
     box-sizing: border-box;
   }
@@ -44,13 +44,14 @@
   }
   .touch-point {
     position: absolute;
-    min-width: 36px;
-    padding: 4px 5px;
+    min-width: 60px;
+    min-height: 35px;
+    padding: 8px 11px;
     border: 1px solid #555;
-    border-radius: 4px;
+    border-radius: 999px;
     background: #101010;
     color: #ddd;
-    font: 6px monospace;
+    font: 9px monospace;
     letter-spacing: 1px;
     text-align: center;
     touch-action: manipulation;
@@ -101,10 +102,11 @@
     }
     .touch-point {
       position: absolute;
-      min-width: 34px;
+      min-width: 55px;
+      min-height: 32px;
       width: auto;
-      font-size: 6px;
-      padding: 4px 5px;
+      font-size: 8px;
+      padding: 7px 9px;
     }
     #copyright {
       font-size: 10px;
@@ -719,15 +721,6 @@ function drawMouth(mainCtx,expr,amp,opts={}){
   push(mainCtx,MX,MY,c);
 }
 
-// ── Label ─────────────────────────────────────────────────────
-function drawLabel(mainCtx, expr){
-  const ctx=mainCtx;
-  ctx.fillStyle=C_BG; ctx.fillRect(0,0,SCREEN_W*SCALE,32*SCALE);
-  ctx.fillStyle='#FFF'; ctx.font=`bold ${Math.round(14*SCALE)}px monospace`;
-  ctx.textAlign='center'; ctx.textBaseline='top';
-  ctx.fillText(EXPR_NAMES[expr],(SCREEN_W/2)*SCALE,14*SCALE);
-}
-
 // ── Full render ───────────────────────────────────────────────
 // Draw all face elements to any same-sized ctx (no label)
 function drawFaceToCtx(ctx, expr, opts={}) {
@@ -756,11 +749,9 @@ function render(){
   if(curExpr===EXPR.WACKY3D){
     drawWacky3DTexture(); // render small WACKY face as perspective texture
     renderPerspectiveFace(ctx);
-    drawLabel(ctx, EXPR.WACKY3D);
     return;
   }
   drawFaceToCtx(ctx, curExpr);
-  drawLabel(ctx, curExpr);
 }
 
 // ── Update logic ──────────────────────────────────────────────
