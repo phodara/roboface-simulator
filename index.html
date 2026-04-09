@@ -726,21 +726,61 @@ function drawMouth(mainCtx,expr,amp,opts={}){
   }
 
   if(expr===EXPR.LOVING){
-    const kiss=Math.sin(now*0.006);
-    const lipW=24+Math.round(kiss*4);
-    const lipH=20+Math.round(kiss*3);
-    const lipX=Math.floor(MW/2-lipW/2);
-    const lipY=bY-6-Math.round(kiss);
-    const innerW=Math.max(6,lipW-20-Math.round(kiss*2));
-    const innerH=Math.max(8,lipH-8+Math.round(kiss*2));
-    const innerX=Math.floor(MW/2-innerW/2);
-    const innerY=lipY+4;
-    fillVCapsule(c,lipX+6,lipY,lipW-12,lipH,C_NOSE);
-    fillCircle(c,lipX+8,lipY+6,5+Math.round(kiss),C_NOSE);
-    fillCircle(c,lipX+lipW-8,lipY+6,5+Math.round(kiss),C_NOSE);
-    fillVCapsule(c,innerX,innerY,innerW,innerH,C_BG);
-    drawCircle(c,Math.floor(MW/2),lipY+10,4,C_TONGUE_DIM);
-    drawHLine(c,lipX+7,lipY+10,lipW-14,C_TONGUE_DIM);
+    const kiss=Math.sin(now*0.0035);
+    const cx=Math.floor(MW/2);
+    const cy=bY+3-Math.round(kiss);
+    const lipScale=1+kiss*0.06;
+    const lipW=22*0.85*lipScale;
+    const upperH=10*0.85*lipScale;
+    const lowerH=12*0.85*lipScale;
+    const tipInset=lipW*0.84;
+    const topOuter=lipW*0.6;
+    const topInner=lipW*0.3;
+    const pout = (Math.sin(now*0.006)+1)*0.5;
+    const partGap = (0.8 + pout*3.2) * 3;
+    const centerPull = 0.5 + pout*1.6;
+
+    c.fillStyle=C_NOSE;
+    c.beginPath();
+    c.moveTo(cx-lipW,cy);
+    c.lineTo(cx-tipInset,cy-upperH*0.18);
+    c.bezierCurveTo(cx-topOuter,cy-upperH*1.2,cx-topInner,cy-upperH*1.48,cx-1,cy-upperH*0.55);
+    c.bezierCurveTo(cx+1,cy-upperH*0.55,cx+topInner,cy-upperH*1.48,cx+topOuter,cy-upperH*1.2);
+    c.lineTo(cx+tipInset,cy-upperH*0.18);
+    c.lineTo(cx+lipW,cy+0.1);
+    c.bezierCurveTo(cx+lipW*0.82,cy+0.18,cx+lipW*0.28,cy+0.45+centerPull,cx,cy+0.4+centerPull);
+    c.bezierCurveTo(cx-lipW*0.28,cy+0.45+centerPull,cx-lipW*0.82,cy+0.18,cx-lipW,cy+0.1);
+    c.closePath();
+    c.fill();
+
+    c.beginPath();
+    c.moveTo(cx-lipW,cy+0.9);
+    c.lineTo(cx-lipW*0.86,cy+0.48);
+    c.bezierCurveTo(cx-lipW*0.74,cy+lowerH*0.18,cx-lipW*0.42,cy+lowerH*1.18,cx-2,cy+lowerH*0.78);
+    c.bezierCurveTo(cx+lipW*0.08,cy+lowerH*1.22,cx+lipW*0.46,cy+lowerH*0.92,cx+lipW*0.76,cy+0.38);
+    c.lineTo(cx+lipW,cy-0.12);
+    c.bezierCurveTo(cx+lipW*0.74,cy+0.12,cx+lipW*0.18,cy+0.9-centerPull*0.35,cx-1,cy+1.76-centerPull*0.5);
+    c.bezierCurveTo(cx-lipW*0.36,cy+0.84-centerPull*0.25,cx-lipW*0.8,cy+0.22,cx-lipW,cy+0.9);
+    c.closePath();
+    c.fill();
+
+    c.fillStyle=C_BG;
+    c.beginPath();
+    c.moveTo(cx-lipW*0.34,cy+0.92);
+    c.bezierCurveTo(cx-lipW*0.22,cy+0.12,cx-lipW*0.1,cy-partGap*0.18,cx,cy-partGap*0.28);
+    c.bezierCurveTo(cx+lipW*0.1,cy-partGap*0.18,cx+lipW*0.22,cy+0.12,cx+lipW*0.34,cy+0.92);
+    c.bezierCurveTo(cx+lipW*0.23,cy+1.55+partGap*0.18,cx+lipW*0.11,cy+2.02+partGap*0.22,cx,cy+2.08+partGap*0.2);
+    c.bezierCurveTo(cx-lipW*0.11,cy+2.02+partGap*0.22,cx-lipW*0.23,cy+1.55+partGap*0.18,cx-lipW*0.34,cy+0.92);
+    c.closePath();
+    c.fill();
+
+    c.strokeStyle=C_BG;
+    c.lineWidth=2;
+    c.beginPath();
+    c.moveTo(cx-lipW*0.94,cy+0.25);
+    c.bezierCurveTo(cx-lipW*0.58,cy+1.55,cx-lipW*0.16,cy-1.15-partGap*0.15,cx+1,cy+1.5);
+    c.bezierCurveTo(cx+lipW*0.18,cy+3.75+partGap*0.35,cx+lipW*0.54,cy+0.82,cx+lipW*0.94,cy-0.8);
+    c.stroke();
     push(mainCtx,MX,MY,c); return;
   }
 
