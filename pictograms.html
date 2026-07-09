@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pictograms</title>
+  <link rel="icon" type="image/png" href="assets/images/happy.png">
+  <style>
+    :root {
+      --ink: #080808;
+      --paper: #f7f3e7;
+      --panel: #ffffff;
+      --cyan: #00d7ff;
+      --yellow: #fff200;
+      --pink: #ff4fa3;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      min-height: 100%;
+      background:
+        linear-gradient(90deg, rgba(8, 8, 8, .07) 1px, transparent 1px) 0 0 / 36px 36px,
+        linear-gradient(rgba(8, 8, 8, .055) 1px, transparent 1px) 0 0 / 36px 36px,
+        var(--paper);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    .site-menu {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 30;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .menu-toggle {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      background: var(--panel);
+      border: 3px solid var(--ink);
+      color: var(--ink);
+      box-shadow: 5px 5px 0 var(--ink);
+      cursor: pointer;
+    }
+
+    .menu-toggle:hover,
+    .menu-toggle:focus {
+      background: var(--yellow);
+      outline: none;
+    }
+
+    .menu-toggle span,
+    .menu-toggle::before,
+    .menu-toggle::after {
+      content: "";
+      display: block;
+      width: 22px;
+      height: 3px;
+      background: currentColor;
+      transition: transform .2s ease, opacity .2s ease;
+    }
+
+    .menu-toggle::before { transform: translateY(-7px); }
+    .menu-toggle::after { transform: translateY(7px); }
+
+    .site-menu[data-open="true"] .menu-toggle span { opacity: 0; }
+    .site-menu[data-open="true"] .menu-toggle::before { transform: translateY(3px) rotate(45deg); }
+    .site-menu[data-open="true"] .menu-toggle::after { transform: translateY(-3px) rotate(-45deg); }
+
+    .menu-panel {
+      position: absolute;
+      top: 58px;
+      left: 0;
+      width: min(280px, calc(100vw - 32px));
+      display: none;
+      gap: 8px;
+      padding: 12px;
+      background: var(--panel);
+      border: 3px solid var(--ink);
+      box-shadow: 8px 8px 0 var(--ink);
+    }
+
+    .site-menu[data-open="true"] .menu-panel { display: grid; }
+
+    .menu-panel a {
+      display: block;
+      padding: 12px 13px;
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 950;
+      letter-spacing: .08em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .menu-panel a:hover,
+    .menu-panel a:focus {
+      background: var(--cyan);
+      outline: none;
+    }
+
+    main {
+      width: min(100%, 1100px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 86px 24px 48px;
+    }
+
+    .stage {
+      display: grid;
+      gap: 22px;
+      align-items: center;
+      justify-items: center;
+    }
+
+    h1 {
+      margin: 0;
+      width: 100%;
+      color: var(--ink);
+      font-size: clamp(44px, 9vw, 110px);
+      font-weight: 950;
+      line-height: .86;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .gif-frame {
+      width: min(100%, 680px);
+      border: 4px solid var(--ink);
+      background: var(--panel);
+      box-shadow: 12px 12px 0 var(--pink);
+    }
+
+    .gif-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    @media (max-width: 620px) {
+      main {
+        padding: 78px 16px 34px;
+      }
+
+      .gif-frame {
+        box-shadow: 7px 7px 0 var(--pink);
+      }
+    }
+  </style>
+</head>
+<body>
+  <script src="assets/site-menu.js"></script>
+
+  <main>
+    <section class="stage" aria-labelledby="page-title">
+      <h1 id="page-title">Pictograms</h1>
+      <div class="gif-frame">
+        <img src="assets/images/NameYourPictogram.gif" alt="Name Your Pictogram">
+      </div>
+    </section>
+  </main>
+</body>
+</html>
