@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="assets/images/happy.png">
+<title>LilyGO T-Display C5 WiFi/BLE Analyzer</title>
+<style>
+  :root {
+    --cyan: #7dd3fc;
+    --cyan-strong: #00e5ff;
+    --line: #2a6f78;
+    --green: #00ff66;
+    --ink: #d7dee3;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    min-height: 100vh;
+    margin: 0;
+    background: #111;
+    color: var(--ink);
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .site-menu {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 20;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .menu-toggle {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    background: #101010;
+    border: 1px solid var(--cyan-strong);
+    color: var(--cyan);
+    box-shadow: 0 0 0 1px rgba(0, 229, 255, .2);
+    cursor: pointer;
+  }
+
+  .menu-toggle:hover,
+  .menu-toggle:focus {
+    border-color: var(--green);
+    color: var(--green);
+    outline: none;
+  }
+
+  .menu-toggle span,
+  .menu-toggle::before,
+  .menu-toggle::after {
+    content: "";
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: currentColor;
+    transition: transform .2s ease, opacity .2s ease;
+  }
+
+  .menu-toggle::before { transform: translateY(-6px); }
+  .menu-toggle::after { transform: translateY(6px); }
+  .site-menu[data-open="true"] .menu-toggle span { opacity: 0; }
+  .site-menu[data-open="true"] .menu-toggle::before { transform: translateY(2px) rotate(45deg); }
+  .site-menu[data-open="true"] .menu-toggle::after { transform: translateY(-2px) rotate(-45deg); }
+
+  .menu-panel {
+    position: absolute;
+    top: 54px;
+    left: 0;
+    width: min(260px, calc(100vw - 28px));
+    display: none;
+    padding: 10px;
+    background: #101010;
+    border: 1px solid var(--cyan-strong);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .45);
+  }
+
+  .site-menu[data-open="true"] .menu-panel {
+    display: grid;
+    gap: 8px;
+  }
+
+  .menu-panel a {
+    display: block;
+    padding: 12px;
+    color: var(--cyan);
+    border: 1px solid var(--line);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .menu-panel a:hover,
+  .menu-panel a:focus {
+    border-color: var(--green);
+    color: var(--green);
+    outline: none;
+  }
+
+  main {
+    width: min(1120px, 100%);
+    margin: 0 auto;
+    padding: 78px 20px 44px;
+  }
+
+  .project {
+    display: grid;
+    grid-template-columns: minmax(280px, .9fr) minmax(300px, 1.1fr);
+    gap: clamp(24px, 5vw, 58px);
+    align-items: center;
+  }
+
+  .project-media {
+    background: #071315;
+    border: 1px solid var(--line);
+    padding: clamp(10px, 2vw, 18px);
+  }
+
+  .project-media img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .release-graphic {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 14px;
+  }
+
+  .eyebrow {
+    margin: 0 0 10px;
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    margin: 0;
+    color: var(--cyan);
+    font-size: clamp(34px, 5.2vw, 56px);
+    line-height: .94;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .version {
+    margin: 12px 0 0;
+    color: #fff;
+    font-size: clamp(18px, 3vw, 28px);
+    font-weight: 900;
+  }
+
+  .description {
+    max-width: 620px;
+    margin: 24px 0 0;
+    color: var(--ink);
+    font-size: clamp(17px, 2vw, 21px);
+    line-height: 1.48;
+    font-weight: 700;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 30px;
+  }
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 18px;
+    color: #071315;
+    background: var(--cyan);
+    border: 1px solid var(--cyan);
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .button.secondary {
+    color: var(--cyan);
+    background: transparent;
+  }
+
+  .button:hover,
+  .button:focus {
+    color: #071315;
+    background: var(--green);
+    border-color: var(--green);
+    outline: none;
+  }
+
+  .details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: clamp(30px, 6vw, 64px);
+  }
+
+  .detail {
+    min-height: 112px;
+    padding: 18px;
+    border: 1px solid var(--line);
+    background: #071315;
+  }
+
+  .detail h2 {
+    margin: 0 0 8px;
+    color: var(--cyan);
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .detail p {
+    margin: 0;
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.45;
+    font-weight: 700;
+  }
+
+  .detail-links {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .detail-links a {
+    color: var(--cyan);
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+
+  .detail-links a:hover,
+  .detail-links a:focus {
+    color: var(--green);
+    outline: none;
+  }
+
+  @media (max-width: 760px) {
+    main {
+      padding-top: 72px;
+    }
+
+    .project,
+    .details {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+<script src="assets/site-menu.js"></script>
+<main>
+  <section class="project" aria-labelledby="project-title">
+    <div class="project-media">
+      <img src="https://github.com/user-attachments/assets/04c630fe-b077-48b6-a377-c4726b4ede97" alt="LilyGO T-Display C5 running the WiFi/BLE Analyzer in a custom 3D-printed enclosure">
+    </div>
+    <div>
+      <p class="eyebrow">LilyGO Project</p>
+      <h1 id="project-title">PocketProwler</h1>
+      <p class="version">LilyGO T-Display C5 WiFi/BLE Analyzer v2.1.0</p>
+      <p class="description">PlatformIO WiFi and Bluetooth scanner for the LilyGO T-Display C5. It scans nearby WiFi networks, shows SSID, RSSI, signal bars, channel, band, and security, and adds a Bluetooth scanner mode with passive and active BLE options. The handheld build fits into a custom 3D-printed enclosure designed for the T-Display C5 with a 3000 mAh LiPo.</p>
+      <div class="actions">
+        <a class="button" href="https://github.com/phodara/LilygoTDisplayC5/releases/latest" target="_blank" rel="noopener">Latest Release</a>
+        <a class="button secondary" href="https://github.com/phodara/LilygoTDisplayC5" target="_blank" rel="noopener">GitHub Project</a>
+        <a class="button secondary" href="https://makerworld.com/en/models/3219883-lilygo-t-display-c5-case-lipo#profileId-3645810" target="_blank" rel="noopener">MakerWorld Case</a>
+        <a class="button secondary" href="https://www.printables.com/model/1824593-case-for-lilygo-t-display-c5-3000-mah-lipo" target="_blank" rel="noopener">Printables Case</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="details" aria-label="Project highlights">
+    <article class="detail">
+      <h2>WiFi</h2>
+      <p>Scan nearby networks and inspect radio conditions from the handheld display.</p>
+    </article>
+    <article class="detail">
+      <h2>BLE</h2>
+      <p>Shows nearby BLE names, address details, RSSI, signal bars, last-seen age, and RSSI history.</p>
+    </article>
+    <article class="detail">
+      <h2>Buttons</h2>
+      <p>Use the upper button to scroll, the lower button to cycle views, and both buttons together to switch WiFi/Bluetooth modes.</p>
+    </article>
+    <article class="detail">
+      <h2>Enclosure</h2>
+      <p>Custom 3D-printable case files are available on MakerWorld and Printables for the LilyGO T-Display C5 3000 mAh LiPo build.</p>
+      <div class="detail-links">
+        <a href="https://makerworld.com/en/models/3219883-lilygo-t-display-c5-case-lipo#profileId-3645810" target="_blank" rel="noopener">MakerWorld enclosure</a>
+        <a href="https://www.printables.com/model/1824593-case-for-lilygo-t-display-c5-3000-mah-lipo" target="_blank" rel="noopener">Printables enclosure</a>
+      </div>
+    </article>
+  </section>
+
+  <section class="details" aria-label="Release graphics">
+    <article class="detail">
+      <h2>Splash Screen</h2>
+      <img class="release-graphic" src="https://raw.githubusercontent.com/phodara/LilygoTDisplayC5/42b126e/docs/release-assets/splash-screen-release-graphic.svg" alt="PocketProwler splash screen release graphic">
+    </article>
+    <article class="detail">
+      <h2>Button Functions</h2>
+      <img class="release-graphic" src="https://raw.githubusercontent.com/phodara/LilygoTDisplayC5/42b126e/docs/release-assets/button-functions-release-graphic.svg" alt="Button functions release graphic">
+    </article>
+    <article class="detail">
+      <h2>Version 2.1</h2>
+      <p>Adds UI cleanup, new button functions, fixed WiFi header positioning, BSSID detail improvements, scan pacing updates, and a longer BLE scan window.</p>
+    </article>
+  </section>
+</main>
+</body>
+</html>
