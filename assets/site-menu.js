@@ -7,21 +7,7 @@
     { href: 'index.html', label: 'Vidiotbox-website' },
     { href: 'pictograms.html', label: 'Pictograms' },
     { href: 'vidiotbox-hardware_docs.html', label: 'Vidiotbox-hardware Docs' },
-    {
-      type: 'section',
-      label: 'LilyGO Project'
-    },
-    {
-      type: 'project',
-      title: 'LilyGO T-Display C5 WiFi/BLE Analyzer',
-      eyebrow: 'UniGeek firmware',
-      image: 'https://lilygo.cc/cdn/shop/files/LILYGO-T-DISPLAY-C5_7.jpg?v=1783057404&width=600',
-      description: 'One firmware for ESP32 boards with WiFi, BLE, NFC, IR, Sub-GHz, USB HID, web flashing, and on-device tools for research and education.',
-      links: [
-        { href: 'https://github.com/lshaf/unigeek/releases/latest', label: 'Latest release', external: true },
-        { href: 'https://unigeek.xid.run/', label: 'Project site', external: true }
-      ]
-    },
+    { href: 'lilygo-t-display-c5.html', label: 'LilyGO T-Display C5 WiFi/BLE Analyzer' },
     {
       type: 'section',
       label: 'Paul Hodara'
@@ -41,7 +27,7 @@
     style.id = 'shared-menu-project-styles';
     style.textContent = `
       .menu-panel {
-        width: min(340px, calc(100vw - 28px));
+        width: min(260px, calc(100vw - 28px));
         max-height: calc(100vh - 82px);
         overflow-y: auto;
       }
@@ -53,55 +39,6 @@
         letter-spacing: 1.4px;
         text-transform: uppercase;
       }
-      .menu-project {
-        display: grid;
-        gap: 10px;
-        padding: 10px;
-        border: 1px solid #2a6f78;
-        background: #071315;
-      }
-      .menu-project img {
-        display: block;
-        width: 100%;
-        aspect-ratio: 16 / 10;
-        object-fit: cover;
-        background: #fff;
-      }
-      .menu-project-kicker {
-        margin: 0 0 3px;
-        color: #b7bbc6;
-        font-size: 10px;
-        font-weight: 800;
-        letter-spacing: 1.2px;
-        text-transform: uppercase;
-      }
-      .menu-project-title {
-        margin: 0;
-        color: #7dd3fc;
-        font-size: 13px;
-        line-height: 1.25;
-        font-weight: 900;
-        letter-spacing: .5px;
-        text-transform: uppercase;
-      }
-      .menu-project-description {
-        margin: 6px 0 0;
-        color: #d7dee3;
-        font-size: 12px;
-        line-height: 1.45;
-        font-weight: 600;
-        letter-spacing: 0;
-      }
-      .menu-project-links {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-      }
-      .menu-panel .menu-project-link {
-        padding: 9px 8px;
-        text-align: center;
-        font-size: 11px;
-      }
     `;
     document.head.appendChild(style);
   }
@@ -109,50 +46,6 @@
   function applyExternalAttrs(link) {
     link.target = '_blank';
     link.rel = 'noopener';
-  }
-
-  function createProjectCard(item) {
-    const card = document.createElement('div');
-    card.className = 'menu-project';
-
-    const image = document.createElement('img');
-    image.src = item.image;
-    image.alt = item.title;
-    image.loading = 'lazy';
-    card.appendChild(image);
-
-    const copy = document.createElement('div');
-
-    const eyebrow = document.createElement('p');
-    eyebrow.className = 'menu-project-kicker';
-    eyebrow.textContent = item.eyebrow;
-    copy.appendChild(eyebrow);
-
-    const title = document.createElement('h2');
-    title.className = 'menu-project-title';
-    title.textContent = item.title;
-    copy.appendChild(title);
-
-    const description = document.createElement('p');
-    description.className = 'menu-project-description';
-    description.textContent = item.description;
-    copy.appendChild(description);
-
-    card.appendChild(copy);
-
-    const links = document.createElement('div');
-    links.className = 'menu-project-links';
-    item.links.forEach(function (projectLink) {
-      const link = document.createElement('a');
-      link.className = 'menu-project-link';
-      link.href = projectLink.href;
-      link.textContent = projectLink.label;
-      if (projectLink.external) applyExternalAttrs(link);
-      links.appendChild(link);
-    });
-    card.appendChild(links);
-
-    return card;
   }
 
   function createMenu() {
@@ -177,11 +70,6 @@
         heading.className = 'menu-section';
         heading.textContent = item.label;
         menuPanel.appendChild(heading);
-        return;
-      }
-
-      if (item.type === 'project') {
-        menuPanel.appendChild(createProjectCard(item));
         return;
       }
 
