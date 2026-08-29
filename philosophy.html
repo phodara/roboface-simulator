@@ -162,7 +162,7 @@
     width: min(1180px, 98vw);
     text-align: center;
     transform-origin: 50% 0;
-    animation: philosophy-crawl 240s linear infinite;
+    animation: philosophy-crawl 240s linear forwards;
   }
 
   h1 {
@@ -350,5 +350,10 @@
   <p class="end">All-Nonsense!</p>
   </div>
 </main>
+<script>
+  document.querySelector('.crawl').addEventListener('animationend', function () {
+    window.location.href = 'index.html';
+  });
+</script>
 </body>
 </html>
