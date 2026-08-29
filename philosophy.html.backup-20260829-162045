@@ -300,42 +300,86 @@
 <script src="assets/site-menu.js"></script>
 <main class="crawl-stage">
   <div class="crawl">
-  <h1>THE VIDIOTBOX PRINCIPLES</h1>
-  <h2>An Evolving Philosophy of Technological Nonsense</h2>
+  <p class="principle">Do not attempt to click off this screen, do not attempt to quickly skim through this message. We are now in control of your experience.</p>
 
-  <p class="principle">BUILD WHAT NEED NOT BE BUILT!</p>
+  <h1>The Vidiotbox Principles</h1>
+  <h2>A Modest Philosophy of Technological Nonsense</h2>
+
+  <p class="principle">Build What Need Not Be Built!</p>
 
   <p>The useful has enough advocates.</p>
+  <p>Civilization already contains an adequate supply of thermostats, spreadsheets, doorbells, productivity apps and devices that promise to optimize your morning.</p>
 
-  <p>Civilization already contains an adequate supply of thermostats, spreadsheets, doorbells, productivity apps and devices that promise to optimize our lives.</p>
+  <p class="principle">Vidiotbox Exists For Everything Else.</p>
 
-  <p class="principle">VIDIOTBOX EXISTS FOR EVERYTHING ELSE.</p>
+  <p>We believe technology need not solve a problem.</p>
+  <p>A circuit may blink simply because blinking is pleasing.</p>
+  <p>A computer may calculate something nobody needs to know.</p>
+  <p>A sensor may detect that which was perfectly satisfactory undetected.</p>
+  <p>A machine may perform, with extraordinary precision, a task of negligible importance.</p>
+
+  <p class="principle">This Is Progress Of A Different Sort!</p>
 
   <p>If something is pointless but entertaining, it has a point.</p>
+  <p>If it is useless but makes you wonder how it works, it has value.</p>
+  <p>If the sensible question is <strong>&ldquo;Why?&rdquo;</strong>, the Vidiotbox answer is <strong>&ldquo;Why not?&rdquo;</strong></p>
+  <p>Curiosity requires no business case.</p>
+  <p>Wonder needs no practical application.</p>
+  <p>Learning disguised as fooling around is still learning.</p>
 
-  <p>If it is useless but makes you wonder, it has value.</p>
-
-  <p>Vidiotbox answers the question <strong>&ldquo;Why?&rdquo; </strong>with <strong>&ldquo;Why not?&rdquo;</strong></p>
-
-  <p class="principle">COMPLICATE THE TRIVIAL!</p>
+  <p class="principle">Complicate The Trivial!</p>
 
   <p>Use microcontrollers where a switch would suffice!</p>
-
   <p>Add Wi-Fi to things that have nothing to say!</p>
-
+  <p>Measure the immeasurable!</p>
   <p>Display the unnecessary!</p>
-
   <p>Automate that which was easier to do by hand!</p>
+  <p>Spend six hours engineering a device that saves eleven seconds!</p>
+  <p>Then improve it.</p>
 
+  <p>Because the distance between <strong>&ldquo;I wonder if...&rdquo;</strong> and <strong>&ldquo;Look what this stupid thing does!&rdquo;</strong> is where interesting things happen.</p>
+
+  <p>Failure is permitted.</p>
+  <p>Bad ideas are encouraged.</p>
   <p>Overengineering is practically mandatory.</p>
+  <p>Documentation is desirable, if only so future generations can determine what went wrong.</p>
 
-  <p>A pointless machine beautifully made is preferable to a practical machine that does not inspire.</p>
+  <p>But nonsense must be <strong>good nonsense.</strong></p>
+
+  <p>Build carefully.</p>
+  <p>Understand what you build.</p>
+  <p>Share what you learn.</p>
+  <p>Take the technology seriously.</p>
+  <p>Take yourself considerably less seriously.</p>
+
+  <p>A pointless machine beautifully made is preferable to a useful machine badly understood.</p>
+  <p>And occasionally, while pursuing something of absolutely negligible value, you may accidentally discover something useful.</p>
+
+  <p class="principle">Do Not Be Alarmed.</p>
+
+  <p>This sometimes happens.</p>
+  <p>The cure is to immediately begin another unnecessary project.</p>
+  <p>For the world contains mysteries enough, components enough, blinking LEDs enough, abandoned ideas enough and curious people enough to keep us occupied indefinitely.</p>
+
+  <div class="short-lines">
+    <p>So solder!</p>
+    <p>Code!</p>
+    <p>Print!</p>
+    <p>Measure!</p>
+    <p>Break!</p>
+    <p>Repair!</p>
+    <p>Modify!</p>
+    <p>Observe!</p>
+  </div>
+
+  <p>And above all&mdash;</p>
+
+  <p class="principle">Remain Curious!</p>
 
   <p>We are not attempting to change the world.</p>
-
   <p>We are attempting to make it <strong>slightly more interesting.</strong></p>
 
-  <p class="end">WHAT THE WORLD NEEDS IS MORE NONSENSE!</p>
+  <p class="end">All-Nonsense!</p>
   </div>
 </main>
 <script>
