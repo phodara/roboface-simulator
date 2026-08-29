@@ -4,7 +4,6 @@
     { href: 'index.html', label: 'Vidiotbox-website' },
     { href: 'vidiotbox-hardware_docs.html', label: 'Vidiotbox-hardware Docs' },
     { href: 'lilygo-t-display-c5.html', label: 'POCKET PROWLER WIFI/BLE ANALYZER' },
-    { href: 'docs/pocketprowler-instruction-manual.html', label: 'POCKET PROWLER MANUAL' },
     { href: 'https://www.instagram.com/phodara', label: 'Follow me on Instagram', external: true },
     { href: 'https://www.paulhodara.com', label: 'My Photography', external: true },
     { href: 'https://www.linkedin.com/in/paulhodara/', label: 'Connect with me on LinkedIn', external: true },
