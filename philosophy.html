@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="assets/images/happy.png">
+<title>Vidiotbox Philosophy</title>
+<meta name="description" content="The Vidiotbox principles: a modest philosophy of technological nonsense, curiosity, and good pointless machines.">
+<link rel="canonical" href="https://www.vidiotbox.net/philosophy.html">
+<meta property="og:title" content="The Vidiotbox Principles">
+<meta property="og:description" content="A modest philosophy of technological nonsense.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.vidiotbox.net/philosophy.html">
+<meta property="og:image" content="https://www.vidiotbox.net/assets/images/happy.png">
+<meta name="twitter:card" content="summary">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZGS5FGL194"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ZGS5FGL194');
+</script>
+<style>
+  :root {
+    --cyan: #7dd3fc;
+    --cyan-strong: #00e5ff;
+    --line: #2a6f78;
+    --green: #00ff66;
+    --ink: #d7dee3;
+    --muted: #aeb4bd;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    min-height: 100vh;
+    margin: 0;
+    background: #111;
+    color: var(--ink);
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .site-menu {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 20;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .menu-toggle {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    background: #101010;
+    border: 1px solid var(--cyan-strong);
+    color: var(--cyan);
+    box-shadow: 0 0 0 1px rgba(0, 229, 255, .2);
+    cursor: pointer;
+  }
+
+  .menu-toggle:hover,
+  .menu-toggle:focus {
+    border-color: var(--green);
+    color: var(--green);
+    outline: none;
+  }
+
+  .menu-toggle span,
+  .menu-toggle::before,
+  .menu-toggle::after {
+    content: "";
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: currentColor;
+    transition: transform .2s ease, opacity .2s ease;
+  }
+
+  .menu-toggle::before { transform: translateY(-6px); }
+  .menu-toggle::after { transform: translateY(6px); }
+  .site-menu[data-open="true"] .menu-toggle span { opacity: 0; }
+  .site-menu[data-open="true"] .menu-toggle::before { transform: translateY(2px) rotate(45deg); }
+  .site-menu[data-open="true"] .menu-toggle::after { transform: translateY(-2px) rotate(-45deg); }
+
+  .menu-panel {
+    position: absolute;
+    top: 54px;
+    left: 0;
+    width: min(260px, calc(100vw - 28px));
+    display: none;
+    padding: 10px;
+    background: #101010;
+    border: 1px solid var(--cyan-strong);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .45);
+  }
+
+  .site-menu[data-open="true"] .menu-panel {
+    display: grid;
+    gap: 8px;
+  }
+
+  .menu-panel a {
+    display: block;
+    padding: 12px;
+    color: var(--cyan);
+    border: 1px solid var(--line);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .menu-panel a:hover,
+  .menu-panel a:focus {
+    border-color: var(--green);
+    color: var(--green);
+    outline: none;
+  }
+
+  .crawl-stage {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    padding: 0 18px;
+    perspective: 360px;
+    perspective-origin: 50% 16%;
+  }
+
+  .crawl-stage::before,
+  .crawl-stage::after {
+    content: "";
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .crawl-stage::before {
+    top: 0;
+    height: 66vh;
+    background: linear-gradient(#111 0%, #111 28%, rgba(17, 17, 17, .86) 50%, rgba(17, 17, 17, 0) 100%);
+  }
+
+  .crawl-stage::after {
+    bottom: 0;
+    height: 10vh;
+    background: linear-gradient(rgba(17, 17, 17, 0), rgba(17, 17, 17, .72) 80%);
+  }
+
+  .crawl {
+    position: absolute;
+    top: 70vh;
+    width: min(1180px, 98vw);
+    text-align: center;
+    transform-origin: 50% 0;
+    animation: philosophy-crawl 240s linear infinite;
+  }
+
+  h1 {
+    margin: 0;
+    color: var(--cyan);
+    font-size: clamp(76px, 12vw, 150px);
+    line-height: .94;
+    font-weight: 900;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    margin: 14px 0 36px;
+    color: #fff;
+    font-size: clamp(36px, 5.2vw, 64px);
+    line-height: 1.15;
+  }
+
+  p {
+    margin: 0 0 18px;
+    color: var(--ink);
+    font-size: clamp(31px, 4.2vw, 50px);
+    line-height: 1.45;
+    font-weight: 700;
+  }
+
+  .principle {
+    margin: 32px 0 18px;
+    color: var(--green);
+    font-size: clamp(42px, 5.8vw, 72px);
+    line-height: 1.2;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .short-lines p {
+    margin-bottom: 8px;
+    color: #fff;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  strong {
+    color: #fff;
+  }
+
+  .end {
+    margin-top: 34px;
+    color: var(--cyan);
+    font-size: clamp(48px, 7vw, 88px);
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  @keyframes philosophy-crawl {
+    from {
+      transform: rotateX(68deg) translateY(0) scale(.92);
+    }
+
+    to {
+      transform: rotateX(68deg) translateY(-5600px) scale(.08);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .crawl-stage {
+      perspective: 330px;
+      perspective-origin: 50% 28%;
+    }
+
+    .crawl {
+      width: min(760px, 94vw);
+      animation-duration: 240s;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .crawl-stage {
+      position: relative;
+      min-height: 100vh;
+      overflow: visible;
+      padding: 78px 20px 52px;
+      perspective: none;
+    }
+
+    .crawl-stage::before,
+    .crawl-stage::after {
+      display: none;
+    }
+
+    .crawl {
+      position: static;
+      width: min(820px, 100%);
+      margin: 0 auto;
+      animation: none;
+      transform: none;
+    }
+  }
+</style>
+</head>
+<body>
+<script src="assets/site-menu.js"></script>
+<main class="crawl-stage">
+  <div class="crawl">
+  <p class="principle">Do not attempt to click off this screen, do not attempt to quickly skim through this message. We are now in control of you experience.</p>
+
+  <h1>The Vidiotbox Principles</h1>
+  <h2>A Modest Philosophy of Technological Nonsense</h2>
+
+  <p class="principle">Build What Need Not Be Built!</p>
+
+  <p>The useful has enough advocates.</p>
+  <p>Civilization already contains an adequate supply of thermostats, spreadsheets, doorbells, productivity apps and devices that promise to optimize your morning.</p>
+
+  <p class="principle">Vidiotbox Exists For Everything Else.</p>
+
+  <p>We believe technology need not solve a problem.</p>
+  <p>A circuit may blink simply because blinking is pleasing.</p>
+  <p>A computer may calculate something nobody needs to know.</p>
+  <p>A sensor may detect that which was perfectly satisfactory undetected.</p>
+  <p>A machine may perform, with extraordinary precision, a task of negligible importance.</p>
+
+  <p class="principle">This Is Progress Of A Different Sort!</p>
+
+  <p>If something is pointless but entertaining, it has a point.</p>
+  <p>If it is useless but makes you wonder how it works, it has value.</p>
+  <p>If the sensible question is <strong>&ldquo;Why?&rdquo;</strong>, the Vidiotbox answer is <strong>&ldquo;Why not?&rdquo;</strong></p>
+  <p>Curiosity requires no business case.</p>
+  <p>Wonder needs no practical application.</p>
+  <p>Learning disguised as fooling around is still learning.</p>
+
+  <p class="principle">Complicate The Trivial!</p>
+
+  <p>Use microcontrollers where a switch would suffice!</p>
+  <p>Add Wi-Fi to things that have nothing to say!</p>
+  <p>Measure the immeasurable!</p>
+  <p>Display the unnecessary!</p>
+  <p>Automate that which was easier to do by hand!</p>
+  <p>Spend six hours engineering a device that saves eleven seconds!</p>
+  <p>Then improve it.</p>
+
+  <p>Because the distance between <strong>&ldquo;I wonder if...&rdquo;</strong> and <strong>&ldquo;Look what this stupid thing does!&rdquo;</strong> is where interesting things happen.</p>
+
+  <p>Failure is permitted.</p>
+  <p>Bad ideas are encouraged.</p>
+  <p>Overengineering is practically mandatory.</p>
+  <p>Documentation is desirable, if only so future generations can determine what went wrong.</p>
+
+  <p>But nonsense must be <strong>good nonsense.</strong></p>
+
+  <p>Build carefully.</p>
+  <p>Understand what you build.</p>
+  <p>Share what you learn.</p>
+  <p>Take the technology seriously.</p>
+  <p>Take yourself considerably less seriously.</p>
+
+  <p>A pointless machine beautifully made is preferable to a useful machine badly understood.</p>
+  <p>And occasionally, while pursuing something of absolutely negligible value, you may accidentally discover something useful.</p>
+
+  <p class="principle">Do Not Be Alarmed.</p>
+
+  <p>This sometimes happens.</p>
+  <p>The cure is to immediately begin another unnecessary project.</p>
+  <p>For the world contains mysteries enough, components enough, blinking LEDs enough, abandoned ideas enough and curious people enough to keep us occupied indefinitely.</p>
+
+  <div class="short-lines">
+    <p>So solder!</p>
+    <p>Code!</p>
+    <p>Print!</p>
+    <p>Measure!</p>
+    <p>Break!</p>
+    <p>Repair!</p>
+    <p>Modify!</p>
+    <p>Observe!</p>
+  </div>
+
+  <p>And above all&mdash;</p>
+
+  <p class="principle">Remain Curious!</p>
+
+  <p>We are not attempting to change the world.</p>
+  <p>We are attempting to make it <strong>slightly more interesting.</strong></p>
+
+  <p class="end">All-Nonsense!</p>
+  </div>
+</main>
+</body>
+</html>
