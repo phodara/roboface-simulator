@@ -43,15 +43,16 @@
 
   function createMenu() {
     const siteMenu = document.createElement('nav');
+    const opensByDefault = /(^|\/)(index\.html)?$/.test(window.location.pathname);
     siteMenu.className = 'site-menu';
-    siteMenu.dataset.open = 'false';
+    siteMenu.dataset.open = String(opensByDefault);
     siteMenu.setAttribute('aria-label', 'Site navigation');
 
     const menuToggle = document.createElement('button');
     menuToggle.className = 'menu-toggle';
     menuToggle.type = 'button';
-    menuToggle.setAttribute('aria-label', 'Open menu');
-    menuToggle.setAttribute('aria-expanded', 'false');
+    menuToggle.setAttribute('aria-label', opensByDefault ? 'Close menu' : 'Open menu');
+    menuToggle.setAttribute('aria-expanded', String(opensByDefault));
     menuToggle.appendChild(document.createElement('span'));
 
     const menuPanel = document.createElement('div');
