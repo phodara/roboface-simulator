@@ -351,8 +351,30 @@
   </div>
 </main>
 <script>
-  document.querySelector('.crawl').addEventListener('animationend', function () {
+  const crawl = document.querySelector('.crawl');
+  const finalLine = document.querySelector('.end');
+  let returningHome = false;
+
+  function returnHome() {
+    if (returningHome) return;
+    returningHome = true;
     window.location.href = 'index.html';
+  }
+
+  function returnWhenFinalLineAppears() {
+    const finalLineBox = finalLine.getBoundingClientRect();
+
+    if (finalLineBox.top <= window.innerHeight && finalLineBox.bottom >= 0) {
+      returnHome();
+      return;
+    }
+
+    requestAnimationFrame(returnWhenFinalLineAppears);
+  }
+
+  crawl.addEventListener('animationend', returnHome);
+  requestAnimationFrame(function () {
+    requestAnimationFrame(returnWhenFinalLineAppears);
   });
 </script>
 </body>
