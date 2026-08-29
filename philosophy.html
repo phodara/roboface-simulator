@@ -235,8 +235,40 @@
     }
 
     .crawl {
-      width: min(760px, 94vw);
+      width: min(560px, 82vw);
+      animation-name: philosophy-crawl-mobile;
       animation-duration: 240s;
+    }
+
+    h1 {
+      font-size: clamp(44px, 13vw, 76px);
+    }
+
+    h2 {
+      font-size: clamp(24px, 7vw, 36px);
+    }
+
+    p {
+      font-size: clamp(20px, 5.7vw, 31px);
+      line-height: 1.38;
+    }
+
+    .principle {
+      font-size: clamp(26px, 7.5vw, 42px);
+    }
+
+    .end {
+      font-size: clamp(36px, 10vw, 48px);
+    }
+
+    @keyframes philosophy-crawl-mobile {
+      from {
+        transform: rotateX(68deg) translateY(0) scale(.66);
+      }
+
+      to {
+        transform: rotateX(68deg) translateY(-4300px) scale(.08);
+      }
     }
   }
 
@@ -352,7 +384,6 @@
 </main>
 <script>
   const crawl = document.querySelector('.crawl');
-  const finalLine = document.querySelector('.end');
   let returningHome = false;
 
   function returnHome() {
@@ -361,21 +392,7 @@
     window.location.href = 'index.html';
   }
 
-  function returnWhenFinalLineAppears() {
-    const finalLineBox = finalLine.getBoundingClientRect();
-
-    if (finalLineBox.top <= window.innerHeight && finalLineBox.bottom >= 0) {
-      returnHome();
-      return;
-    }
-
-    requestAnimationFrame(returnWhenFinalLineAppears);
-  }
-
   crawl.addEventListener('animationend', returnHome);
-  requestAnimationFrame(function () {
-    requestAnimationFrame(returnWhenFinalLineAppears);
-  });
 </script>
 </body>
 </html>

@@ -250,21 +250,18 @@
     color: #0f0;
     outline: none;
   }
-@media (max-width: 520px) {
-  #screen-wrap {
-    width: 100%;
-    padding: 0;
-  }
-}
+  @media (max-width: 520px) {
     #screen-wrap {
       width: min(100%, var(--canvas-width));
       padding: 17px 43px;
     }
+
     #touch-points {
       position: absolute;
       inset: 0;
       display: block;
     }
+
     .touch-point {
       position: absolute;
       min-width: 55px;
@@ -273,6 +270,7 @@
       font-size: 8px;
       padding: 7px 9px;
     }
+
     #copyright {
       font-size: 10px;
       letter-spacing: 0.5px;
