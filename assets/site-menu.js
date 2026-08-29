@@ -1,9 +1,9 @@
 (function () {
   const menuItems = [
-    { href: 'pictograms.html', label: 'Pictograms' },
-    { href: 'index.html', label: 'Vidiotbox-website' },
+    { href: 'index.html', label: 'VIDEIOTBOX-WEBSITE (HOME)' },
     { href: 'vidiotbox-hardware_docs.html', label: 'Vidiotbox-hardware Docs' },
     { href: 'lilygo-t-display-c5.html', label: 'POCKET PROWLER WIFI/BLE ANALYZER' },
+    { href: 'pictograms.html', label: 'Pictograms' },
     { href: 'https://www.instagram.com/phodara', label: 'Follow me on Instagram', external: true },
     { href: 'https://www.paulhodara.com', label: 'My Photography', external: true },
     { href: 'https://www.linkedin.com/in/paulhodara/', label: 'Connect with me on LinkedIn', external: true },
