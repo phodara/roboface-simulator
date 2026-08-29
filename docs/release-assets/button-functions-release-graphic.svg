@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" role="img" aria-labelledby="title desc">
+  <title id="title">LilyGO T-Display C5 Button Functions</title>
+  <desc id="desc">Release notes graphic showing upper button, lower button, both-button tap, and both-button hold actions for WiFi and Bluetooth modes.</desc>
+  <defs>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000000" flood-opacity="0.30"/>
+    </filter>
+    <filter id="buttonShadow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#000000" flood-opacity="0.38"/>
+    </filter>
+    <style>
+      .page { fill: #0f1419; }
+      .device { fill: #1c242d; stroke: #46515d; stroke-width: 4; }
+      .screen { fill: #000000; stroke: #657180; stroke-width: 3; }
+      .bezelLine { stroke: #2f3842; stroke-width: 2; }
+      .header { fill: #06145c; }
+      .row { fill: #101820; }
+      .selected { fill: #0f6570; }
+      .panel { fill: #171f28; stroke: #5b6876; stroke-width: 2; rx: 8; }
+      .modeWifi { fill: #12383e; stroke: #30d5c8; stroke-width: 2; rx: 8; }
+      .modeBle { fill: #2e294b; stroke: #a78bfa; stroke-width: 2; rx: 8; }
+      .sideButton { fill: #d72f2f; stroke: #ffb3a8; stroke-width: 4; }
+      .sideButtonCore { fill: #ff4b3e; }
+      .buttonIcon { fill: #d72f2f; stroke: #ffb3a8; stroke-width: 3; }
+      .buttonIconCore { fill: #ff4b3e; }
+      .title { font-family: Inter, Arial, sans-serif; font-size: 42px; font-weight: 800; fill: #ffffff; }
+      .subtitle { font-family: Inter, Arial, sans-serif; font-size: 19px; fill: #aeb9c7; }
+      .sectionTitle { font-family: Inter, Arial, sans-serif; font-size: 22px; font-weight: 800; fill: #ffffff; }
+      .label { font-family: Inter, Arial, sans-serif; font-size: 18px; font-weight: 700; fill: #ffffff; }
+      .body { font-family: Inter, Arial, sans-serif; font-size: 16px; fill: #ccd5df; }
+      .small { font-family: Inter, Arial, sans-serif; font-size: 14px; fill: #aeb9c7; }
+      .mono { font-family: Menlo, Consolas, monospace; font-size: 19px; fill: #f4f7fb; }
+      .monoSmall { font-family: Menlo, Consolas, monospace; font-size: 15px; fill: #d7dce3; }
+      .cyan { fill: #5ce0ff; }
+      .yellow { fill: #ffe66b; }
+      .green { fill: #45d66e; }
+      .purple { fill: #c4b5fd; }
+      .muted { fill: #8e99a8; }
+      .footer { font-family: Inter, Arial, sans-serif; font-size: 13px; fill: #7f8b99; }
+    </style>
+  </defs>
+
+  <rect class="page" width="1400" height="900"/>
+
+  <text class="title" x="700" y="72" text-anchor="middle">New Button Functions</text>
+  <text class="subtitle" x="700" y="106" text-anchor="middle">PocketProwler(R) LilyGO t-Display C5 firmware v2.1.0</text>
+
+  <g id="wifi-column" filter="url(#softShadow)">
+    <rect class="modeWifi" x="90" y="150" width="590" height="92"/>
+    <text class="sectionTitle" x="118" y="186">WiFi Screen</text>
+    <text class="body" x="118" y="216">Upper selects APs. Lower cycles RSSI, BSSID detail, and full AP list.</text>
+
+    <rect class="panel" x="90" y="272" width="590" height="104"/>
+    <circle class="buttonIcon" cx="140" cy="318" r="19"/>
+    <circle class="buttonIconCore" cx="140" cy="318" r="10"/>
+    <text class="label" x="178" y="313">Tap Upper</text>
+    <text class="body" x="178" y="341">Selects the next access point.</text>
+
+    <rect class="panel" x="90" y="400" width="590" height="118"/>
+    <circle class="buttonIcon" cx="140" cy="449" r="19"/>
+    <circle class="buttonIconCore" cx="140" cy="449" r="10"/>
+    <text class="label" x="178" y="444">Tap Lower</text>
+    <text class="body" x="178" y="472">Cycles WiFi screen views.</text>
+    <text class="small" x="178" y="496">RSSI history -> BSSID detail -> full AP list</text>
+
+    <rect class="panel" x="90" y="678" width="590" height="112"/>
+    <circle class="buttonIcon" cx="126" cy="726" r="17"/>
+    <circle class="buttonIconCore" cx="126" cy="726" r="8"/>
+    <circle class="buttonIcon" cx="160" cy="726" r="17"/>
+    <circle class="buttonIconCore" cx="160" cy="726" r="8"/>
+    <text class="label" x="198" y="722">Hold Both</text>
+    <text class="body" x="198" y="750">Switches to Bluetooth mode.</text>
+    <text class="small" x="198" y="774">Hold threshold: about 700 ms</text>
+  </g>
+
+  <g id="bluetooth-column" filter="url(#softShadow)">
+    <rect class="modeBle" x="720" y="150" width="590" height="92"/>
+    <text class="sectionTitle" x="748" y="186">Bluetooth Screen</text>
+    <text class="body" x="748" y="216">Upper selects devices. Lower cycles RSSI, address detail, and full BLE list.</text>
+
+    <rect class="panel" x="720" y="272" width="590" height="104"/>
+    <circle class="buttonIcon" cx="770" cy="318" r="19"/>
+    <circle class="buttonIconCore" cx="770" cy="318" r="10"/>
+    <text class="label" x="808" y="313">Tap Upper</text>
+    <text class="body" x="808" y="341">Selects the next BLE device.</text>
+
+    <rect class="panel" x="720" y="400" width="590" height="118"/>
+    <circle class="buttonIcon" cx="770" cy="449" r="19"/>
+    <circle class="buttonIconCore" cx="770" cy="449" r="10"/>
+    <text class="label" x="808" y="444">Tap Lower</text>
+    <text class="body" x="808" y="472">Cycles Bluetooth screen views.</text>
+    <text class="small" x="808" y="496">RSSI history -> address detail -> full BLE list</text>
+
+    <rect class="panel" x="720" y="542" width="590" height="112"/>
+    <circle class="buttonIcon" cx="756" cy="590" r="17"/>
+    <circle class="buttonIconCore" cx="756" cy="590" r="8"/>
+    <circle class="buttonIcon" cx="790" cy="590" r="17"/>
+    <circle class="buttonIconCore" cx="790" cy="590" r="8"/>
+    <text class="label" x="828" y="586">Tap Both</text>
+    <text class="body" x="828" y="614">Toggles passive and active BLE scanning.</text>
+    <text class="small" x="828" y="638">Active scan can reveal extra device names.</text>
+
+    <rect class="panel" x="720" y="678" width="590" height="112"/>
+    <circle class="buttonIcon" cx="756" cy="726" r="17"/>
+    <circle class="buttonIconCore" cx="756" cy="726" r="8"/>
+    <circle class="buttonIcon" cx="790" cy="726" r="17"/>
+    <circle class="buttonIconCore" cx="790" cy="726" r="8"/>
+    <text class="label" x="828" y="722">Hold Both</text>
+    <text class="body" x="828" y="750">Switches back to WiFi mode.</text>
+    <text class="small" x="828" y="774">Hold threshold: about 700 ms</text>
+  </g>
+
+  <g id="timing-strip">
+    <rect x="405" y="812" width="590" height="40" rx="8" fill="#101820" stroke="#394553" stroke-width="1.5"/>
+    <text class="small" x="445" y="837">Debounce: about 220 ms</text>
+    <text class="small" x="700" y="837">Both-button hold: about 700 ms</text>
+  </g>
+
+  <text class="footer" x="700" y="872" text-anchor="middle">Copyright (c) 2026 Paul Hodara. MIT License.</text>
+</svg>
