@@ -7,8 +7,8 @@
     { href: 'index.html', label: 'Vidiotbox-website' },
     { href: 'pictograms.html', label: 'Pictograms' },
     { href: 'vidiotbox-hardware_docs.html', label: 'Vidiotbox-hardware Docs' },
-    { href: 'lilygo-t-display-c5.html', label: 'LilyGO T-Display C5 WiFi/BLE Analyzer' },
-    { href: 'docs/pocketprowler-instruction-manual.html', label: 'Pocket Prowler Instruction Manual' },
+    { href: 'lilygo-t-display-c5.html', label: 'POCKET PROWLER WIFI/BLE ANALYZER' },
+    { href: 'docs/pocketprowler-instruction-manual.html', label: 'POCKET PROWLER MANUAL' },
     {
       type: 'section',
       label: 'Paul Hodara'
