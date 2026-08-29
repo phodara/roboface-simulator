@@ -1,7 +1,7 @@
 (function () {
   const menuItems = [
-    { href: 'index.html', label: 'Vidiotbox-website' },
     { href: 'pictograms.html', label: 'Pictograms' },
+    { href: 'index.html', label: 'Vidiotbox-website' },
     { href: 'vidiotbox-hardware_docs.html', label: 'Vidiotbox-hardware Docs' },
     { href: 'lilygo-t-display-c5.html', label: 'POCKET PROWLER WIFI/BLE ANALYZER' },
     { href: 'docs/pocketprowler-instruction-manual.html', label: 'POCKET PROWLER MANUAL' },
