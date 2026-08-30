@@ -42,7 +42,7 @@
 
   function createMenu() {
     const siteMenu = document.createElement('nav');
-    const opensByDefault = /(^|\/)(index\.html)?$/.test(window.location.pathname);
+    const opensByDefault = false;
     siteMenu.className = 'site-menu';
     siteMenu.dataset.open = String(opensByDefault);
     siteMenu.setAttribute('aria-label', 'Site navigation');
