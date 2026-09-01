@@ -161,6 +161,7 @@
 
     .stage {
       display: flex;
+      flex-direction: column;
       justify-content: flex-end;
       align-items: flex-start;
       padding: 0;
@@ -320,6 +321,21 @@
       line-height: 1.25;
     }
 
+    .license-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.72rem;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    .stage .license-note {
+      align-self: flex-end;
+      width: min(100%, 720px);
+      padding-top: 8px;
+      color: rgba(255, 251, 244, 0.72);
+    }
+
     .chip {
       display: inline-block;
       padding: 6px 10px;
@@ -410,6 +426,12 @@
       margin-top: 0;
     }
 
+    body.smartphone .stage .license-note {
+      width: 100%;
+      padding-top: 2px;
+      font-size: 0.52rem;
+    }
+
     body.smartphone #sliderPanel {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       column-gap: 5px;
@@ -486,6 +508,7 @@
   <main class="shell">
     <section class="stage">
       <canvas id="faceCanvas" width="720" height="960" aria-label="Face simulator preview"></canvas>
+      <p class="license-note">© 2026 Paul Hodara. Licensed under PolyForm Noncommercial 1.0.0.</p>
     </section>
 
     <aside class="controls">
@@ -1260,7 +1283,7 @@
         ]
       };
     }
-    // Copyright 2025 Paul Hodara All Rights Reserved
+    // Copyright 2026 Paul Hodara. Licensed under PolyForm Noncommercial 1.0.0.
 
     function objectBounds(object) {
       const points = [object.start];
@@ -2190,6 +2213,6 @@
     setPreviewButtons(false);
     frame();
   </script>
-  <!-- Copyright 2025 Paul Hodara All Rights Reserved -->
+  <!-- Copyright 2026 Paul Hodara. Licensed under PolyForm Noncommercial 1.0.0. -->
 </body>
 </html>
