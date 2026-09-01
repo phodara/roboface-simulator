@@ -1,0 +1,2195 @@
+<!DOCTYPE html>
+<!--
+  PolyForm Noncommercial License 1.0.0
+  Copyright (c) 2026 Paul Hodara
+  
+  This software is licensed under the PolyForm Noncommercial License 1.0.0.
+  See LICENSE file for full terms.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="assets/images/happy.png">
+  <title>Faceimator</title>
+  <style>
+    :root {
+      --bg: #f5efe4;
+      --panel: rgba(255, 251, 244, 0.88);
+      --ink: #191512;
+      --muted: #5d534d;
+      --accent: #d95d39;
+      --accent-2: #0d6e6e;
+      --grid: rgba(25, 21, 18, 0.08);
+      --shadow: 0 18px 50px rgba(25, 21, 18, 0.14);
+      --radius: 18px;
+      --ui-font: "Avenir Next", "Segoe UI", sans-serif;
+      --display-font: "Georgia", "Times New Roman", serif;
+      --phone-stage-height: 44dvh;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background: #000;
+      font-family: var(--ui-font);
+      overflow: auto;
+    }
+
+    .site-menu {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 20;
+      font-family: var(--ui-font);
+    }
+
+    .menu-toggle {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      background: #101010;
+      border: 1px solid #00E5FF;
+      color: #7dd3fc;
+      box-shadow: 0 0 0 1px rgba(0, 229, 255, .2);
+      cursor: pointer;
+    }
+
+    .menu-toggle:hover,
+    .menu-toggle:focus {
+      border-color: #0f0;
+      color: #0f0;
+      outline: none;
+    }
+
+    .menu-toggle span,
+    .menu-toggle::before,
+    .menu-toggle::after {
+      content: "";
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: currentColor;
+      transition: transform .2s ease, opacity .2s ease;
+    }
+
+    .menu-toggle::before {
+      transform: translateY(-6px);
+    }
+
+    .menu-toggle::after {
+      transform: translateY(6px);
+    }
+
+    .site-menu[data-open="true"] .menu-toggle span {
+      opacity: 0;
+    }
+
+    .site-menu[data-open="true"] .menu-toggle::before {
+      transform: translateY(2px) rotate(45deg);
+    }
+
+    .site-menu[data-open="true"] .menu-toggle::after {
+      transform: translateY(-2px) rotate(-45deg);
+    }
+
+    .menu-panel {
+      position: absolute;
+      top: 54px;
+      left: 0;
+      width: min(260px, calc(100vw - 28px));
+      display: none;
+      padding: 10px;
+      background: #101010;
+      border: 1px solid #00E5FF;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, .45);
+    }
+
+    .site-menu[data-open="true"] .menu-panel {
+      display: grid;
+      gap: 8px;
+    }
+
+    .menu-panel a {
+      display: block;
+      padding: 12px;
+      color: #7dd3fc;
+      border: 1px solid #2a6f78;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .menu-panel a:hover,
+    .menu-panel a:focus {
+      border-color: #0f0;
+      color: #0f0;
+      outline: none;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: minmax(470px, 79vw) minmax(270px, 19vw);
+      gap: 1px;
+      padding: 12px;
+      width: calc(100% / 0.8);
+      min-height: calc(100vh / 0.8);
+      align-items: start;
+      transform: scale(0.8);
+      transform-origin: top left;
+      background: transparent;
+    }
+
+    .controls {
+      width: 100%;
+      min-width: 300px;
+      background: var(--panel);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(25, 21, 18, 0.08);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .stage {
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-start;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      margin: 0;
+      font: 700 clamp(1.35rem, 2.2vw, 2rem) var(--display-font);
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.25;
+    }
+
+    canvas {
+      width: auto;
+      max-width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 16px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.3)),
+        linear-gradient(0deg, rgba(13, 110, 110, 0.05), rgba(217, 93, 57, 0.05)),
+        linear-gradient(180deg, #fbf7ef 0%, var(--bg) 100%);
+      border: 1px solid rgba(25, 21, 18, 0.08);
+    }
+
+    #faceCanvas {
+      max-height: 168vh;
+      margin-left: auto;
+      margin-right: 0;
+    }
+
+    .controls {
+      padding: 12px;
+      display: grid;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .control-group {
+      display: grid;
+      gap: 6px;
+    }
+
+    .control-group h2 {
+      margin: 0;
+      font-size: 0.88rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--accent-2);
+      text-align: center;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .row-with-action {
+      grid-template-columns: 72px 52px minmax(0, 1fr);
+    }
+
+    .row-with-action button {
+      width: auto;
+      min-width: 52px;
+      padding-inline: 12px;
+    }
+
+    label {
+      font-size: 0.74rem;
+      color: var(--muted);
+    }
+
+    select,
+    button,
+    input[type="range"] {
+      width: 100%;
+    }
+
+    select,
+    button,
+    textarea {
+      font: inherit;
+      border-radius: 12px;
+      border: 1px solid rgba(25, 21, 18, 0.15);
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, 0.8);
+      color: var(--ink);
+    }
+
+    input[type="range"] {
+      accent-color: var(--accent);
+      height: 14px;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .value {
+      min-width: 3ch;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      color: var(--ink);
+      font-size: 0.72rem;
+    }
+
+    #sliderPanel {
+      gap: 4px;
+    }
+
+    #sliderPanel .control-group {
+      gap: 2px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      max-height: 20vh;
+      resize: none;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.72rem;
+      line-height: 1.25;
+    }
+
+    .hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.25;
+    }
+
+    .chip {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(13, 110, 110, 0.12);
+      color: var(--accent-2);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    body.smartphone {
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    body.smartphone .shell {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 0 4px 4px;
+      width: 100%;
+      height: auto;
+      transform: none;
+      overflow: visible;
+      align-items: stretch;
+    }
+
+    body.smartphone .controls {
+      flex: 0 0 auto;
+      align-self: stretch;
+      min-width: 0;
+      min-height: 0;
+      padding: 0 3px 3px;
+      gap: 3px;
+      align-content: start;
+      overflow-x: hidden;
+      overflow-y: visible;
+      padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+    }
+
+    body.smartphone .controls > .control-group {
+      gap: 1px;
+    }
+
+    body.smartphone .controls > .control-group h2 {
+      font-size: 0.58rem;
+    }
+
+    body.smartphone .row {
+      gap: 1px;
+    }
+
+    body.smartphone label,
+    body.smartphone .value,
+    body.smartphone .hint,
+    body.smartphone select,
+    body.smartphone button,
+    body.smartphone textarea {
+      font-size: 0.52rem;
+    }
+
+    body.smartphone select,
+    body.smartphone button,
+    body.smartphone textarea {
+      padding: 2px 4px;
+      border-radius: 6px;
+    }
+
+    body.smartphone .button-row {
+      gap: 2px;
+    }
+
+    body.smartphone .stage {
+      flex: 0 0 auto;
+      min-height: calc(var(--phone-stage-height) * 0.68);
+      justify-content: center;
+      align-items: center;
+      padding: 2px 0 0;
+    }
+
+    body.smartphone #faceCanvas {
+      width: min(100%, calc(var(--phone-stage-height) * 0.75));
+      max-height: calc(var(--phone-stage-height) * 0.68 - 2px);
+      margin-inline: auto;
+      margin-top: 0;
+    }
+
+    body.smartphone #sliderPanel {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 5px;
+      row-gap: 2px;
+    }
+
+    body.smartphone #sliderPanel h2 {
+      grid-column: 1 / -1;
+    }
+
+    body.smartphone #sliderPanel .control-group {
+      gap: 1px;
+    }
+
+    body.smartphone .value {
+      min-width: 2ch;
+    }
+
+    body.smartphone #sliderPanel input[type="range"] {
+      height: 6px;
+    }
+
+    body.smartphone textarea {
+      min-height: 32px;
+      max-height: 5svh;
+    }
+
+    body.smartphone .controls > .control-group:last-child {
+      display: none;
+    }
+
+    body.smartphone .controls > .control-group:first-child h2 {
+      display: none;
+    }
+
+    body.smartphone #sliderPanel h2 {
+      display: none;
+    }
+
+    @media (max-width: 960px) {
+      body {
+        overflow: auto;
+      }
+
+      body:not(.smartphone) .shell {
+        grid-template-columns: 1fr;
+        width: 100%;
+        height: auto;
+        min-height: 100vh;
+        transform: none;
+      }
+
+      body:not(.smartphone) #faceCanvas {
+        max-height: none;
+        margin-inline: auto;
+      }
+    }
+
+    @media (max-width: 480px) and (max-height: 900px) {
+      :root {
+        --phone-stage-height: 47dvh;
+      }
+    }
+
+    @media (max-width: 420px) and (max-height: 760px) {
+      :root {
+        --phone-stage-height: 49dvh;
+      }
+    }
+  </style>
+</head>
+<body>
+<script src="assets/site-menu.js"></script>
+  <main class="shell">
+    <section class="stage">
+      <canvas id="faceCanvas" width="720" height="960" aria-label="Face simulator preview"></canvas>
+    </section>
+
+    <aside class="controls">
+      <section class="control-group">
+        <h2>Faceimator Animator</h2>
+        <div class="row row-with-action">
+          <label for="expressionSelect">Loop From</label>
+          <button id="setLoopFromButton" type="button">Set</button>
+          <select id="expressionSelect"></select>
+        </div>
+        <div class="row row-with-action">
+          <label for="previewLoopTarget">Loop To</label>
+          <button id="setLoopToButton" type="button">Set</button>
+          <select id="previewLoopTarget"></select>
+        </div>
+        <div class="button-row">
+          <button id="copyButton" type="button">Copy JSON</button>
+        </div>
+        <div class="row">
+          <label for="previewRepeats">Repeats</label>
+          <input id="previewRepeats" type="number" min="1" max="20" step="1" value="3">
+        </div>
+        <div class="button-row">
+          <button id="previewLoopButton" type="button">Loop Play</button>
+          <button id="stopPreviewButton" type="button">Stop</button>
+        </div>
+      </section>
+
+      <section class="control-group" id="sliderPanel">
+        <h2>Geometry</h2>
+      </section>
+
+      <section class="control-group" id="exportPanel">
+        <h2>Export</h2>
+        <textarea id="jsonOutput" spellcheck="false" readonly></textarea>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("faceCanvas");
+    const ctx = canvas.getContext("2d");
+    const expressionSelect = document.getElementById("expressionSelect");
+    const sliderPanel = document.getElementById("sliderPanel");
+    const exportPanel = document.getElementById("exportPanel");
+    const jsonOutput = document.getElementById("jsonOutput");
+    const copyButton = document.getElementById("copyButton");
+    const previewLoopButton = document.getElementById("previewLoopButton");
+    const stopPreviewButton = document.getElementById("stopPreviewButton");
+    const previewLoopTarget = document.getElementById("previewLoopTarget");
+    const previewRepeats = document.getElementById("previewRepeats");
+    const setLoopFromButton = document.getElementById("setLoopFromButton");
+    const setLoopToButton = document.getElementById("setLoopToButton");
+    const showExportPanel = false;
+
+    function applyDeviceLayout() {
+      const isPhoneLike = /Android|iPhone|iPod/i.test(navigator.userAgent)
+        || (/Mobile/i.test(navigator.userAgent) && window.innerWidth <= 1024)
+        || (window.matchMedia("(pointer: coarse)").matches && window.innerWidth <= 900);
+      document.body.classList.toggle("smartphone", isPhoneLike);
+    }
+
+    function applyPanelVisibility() {
+      exportPanel.style.display = showExportPanel ? "" : "none";
+      copyButton.style.display = showExportPanel ? "" : "none";
+    }
+
+    const firmware = {
+      screenW: 240,
+      screenH: 320,
+      head: { x: 60, y: 78, w: 120, h: 150, r: 34 },
+      leftEyeRegion: { x: 74, y: 140, w: 34, h: 38 },
+      rightEyeRegion: { x: 132, y: 140, w: 34, h: 38 },
+      eyeSocket: { ox: 2, oy: 14, w: 30, h: 18, r: 9 },
+      mouthRegion: { x: 92, y: 195, w: 56, h: 64 },
+      hairRegion: { x: 86, y: 54, w: 72, h: 82 },
+      leftEarRegion: { x: 51, y: 145, w: 18, h: 48 },
+      rightEarRegion: { x: 171, y: 145, w: 18, h: 48 },
+      nose: { x: 114, y: 183, w: 12, h: 6 }
+    };
+
+    const baseFace = {
+      browThickness: 6,
+      showConstruction: false
+    };
+
+    const baseFaceObjects = {
+      leftBrow: {
+        start: [24, 163],
+        segments: [
+          [62, 133, 118, 123, 154, 137],
+          [176, 145, 188, 153, 198, 159]
+        ]
+      },
+      rightBrow: {
+        start: [324, 153],
+        segments: [
+          [356, 131, 398, 125, 434, 137],
+          [452, 143, 468, 155, 484, 169]
+        ]
+      },
+      leftEye: {
+        start: [50, 247],
+        segments: [
+          [22, 175, 122, 153, 160, 209],
+          [196, 263, 88, 287, 56, 233],
+          [30, 189, 122, 187, 152, 243]
+        ]
+      },
+      rightEye: {
+        start: [464, 247],
+        segments: [
+          [492, 175, 392, 153, 354, 209],
+          [318, 263, 426, 287, 458, 233],
+          [484, 189, 392, 187, 362, 243]
+        ]
+      },
+      leftNose: {
+        start: [251, 273],
+        segments: [
+          [255, 323, 251, 377, 233, 429],
+          [215, 483, 171, 541, 157, 581],
+          [147, 615, 159, 641, 195, 641],
+          [215, 641, 227, 633, 239, 623]
+        ]
+      },
+      rightNose: {
+        start: [269, 610],
+        segments: [
+          [285, 626, 317, 624, 331, 596],
+          [341, 570, 325, 536, 309, 500],
+          [293, 462, 283, 416, 287, 374],
+          [291, 324, 297, 284, 305, 264]
+        ]
+      },
+      mouth: {
+        start: [284, 708],
+        segments: [
+          [246, 674, 178, 670, 144, 710],
+          [120, 728, 100, 746, 74, 750],
+          [66, 750, 128, 782, 174, 800],
+          [246, 828, 362, 838, 432, 810],
+          [482, 786, 524, 736, 528, 724],
+          [518, 708, 508, 710, 502, 718],
+          [482, 724, 454, 732, 424, 730],
+          [396, 726, 374, 712, 356, 692],
+          [330, 670, 300, 672, 284, 708]
+        ]
+      }
+    };
+
+    const presets = {
+      neutral: {
+        angryMouth: 0,
+        browTilt: 0,
+        browLift: 0,
+        browCurve: 0,
+        eyelidOpen: 0.92,
+        eyeTilt: 0,
+        eyeSquash: 1.0,
+        eyeballSize: 1.0,
+        pupilSize: 0.18,
+        pupilOffsetX: 0,
+        pupilOffsetY: 0,
+        mouthCurve: 0,
+        mouthDownturn: 0.04,
+        mouthOpen: 0.085,
+        mouthWidthScale: 1.0,
+        mouthLift: 0
+      },
+      happy: {
+        angryMouth: 0.59,
+        browTilt: -0.64,
+        browLift: 0.18,
+        browCurve: 0.08,
+        eyelidOpen: 1.25,
+        eyeTilt: 0.15,
+        eyeSquash: 0.58,
+        eyeballSize: 1.0,
+        pupilSize: 0.16,
+        pupilOffsetX: 0,
+        pupilOffsetY: 0.01,
+        mouthCurve: 0.72,
+        mouthDownturn: -1,
+        mouthOpen: 0.18,
+        mouthWidthScale: 1.08,
+        mouthLift: 3.5
+      },
+      angry: {
+        angryMouth: 1.95,
+        browTilt: 1.48,
+        browLift: -0.01,
+        browCurve: -0.02,
+        eyelidOpen: 0.78,
+        eyeTilt: -0.68,
+        eyeSquash: 0.78,
+        eyeballSize: 1.0,
+        pupilSize: 0.14,
+        pupilOffsetX: 0.2,
+        pupilOffsetY: 0.02,
+        mouthCurve: -0.26,
+        mouthDownturn: 0.34,
+        mouthOpen: 0.04,
+        mouthWidthScale: 1.04,
+        mouthLift: -0.04
+      },
+      surprised: {
+        angryMouth: 0.59,
+        browTilt: 0,
+        browLift: 1,
+        browCurve: 0,
+        eyelidOpen: 0.92,
+        eyeTilt: -0.56,
+        eyeSquash: 1.25,
+        eyeballSize: 1.0,
+        pupilSize: 0.28,
+        pupilOffsetX: 0,
+        pupilOffsetY: 0,
+        mouthCurve: 0,
+        mouthDownturn: 0,
+        mouthOpen: 2.76,
+        mouthWidthScale: 1,
+        mouthLift: 0
+      },
+      sad: {
+        angryMouth: 0.59,
+        browTilt: -0.92,
+        browLift: 0.455,
+        browCurve: -0.4,
+        eyelidOpen: 0.92,
+        eyeTilt: 1.1,
+        eyeSquash: 1,
+        eyeballSize: 1.0,
+        pupilSize: 0.18,
+        pupilOffsetX: 0,
+        pupilOffsetY: 0,
+        mouthCurve: 0,
+        mouthDownturn: 1.04,
+        mouthOpen: 0.15,
+        mouthWidthScale: 1,
+        mouthLift: 0
+      },
+      sleepy: {
+        browTilt: 0,
+        browLift: -0.02,
+        browCurve: -0.02,
+        eyelidOpen: 0.2,
+        eyeTilt: -0.04,
+        eyeSquash: 0.36,
+        eyeballSize: 1.0,
+        pupilSize: 0.13,
+        pupilOffsetX: 0,
+        pupilOffsetY: 0.02,
+        mouthCurve: -0.1,
+        mouthDownturn: 0.2,
+        mouthOpen: 0.03,
+        mouthWidthScale: 0.84,
+        mouthLift: -0.1
+      },
+      loving: {
+        browTilt: 0.04,
+        browLift: 0.02,
+        browCurve: 0.06,
+        eyelidOpen: 0.76,
+        eyeTilt: 0.06,
+        eyeSquash: 0.74,
+        eyeballSize: 1.0,
+        pupilSize: 0.1,
+        pupilOffsetX: 0,
+        pupilOffsetY: 0,
+        mouthCurve: 0.4,
+        mouthDownturn: 0,
+        mouthOpen: 0.08,
+        mouthWidthScale: 1.0,
+        mouthLift: 0.55
+      }
+    };
+
+    const sliderDefs = [
+      ["browTilt", -1.8, 1.8, 0.01],
+      ["browLift", -0.15, 1.0, 0.005],
+      ["browCurve", -0.4, 0.2, 0.005],
+      ["eyelidOpen", 0.05, 1.25, 0.01],
+      ["eyeTilt", -1.4, 1.4, 0.01],
+      ["eyeSquash", 0.25, 1.25, 0.01],
+      ["eyeballSize", 0.55, 1.55, 0.01],
+      ["pupilSize", 0.05, 0.4, 0.005],
+      ["pupilOffsetX", -0.2, 0.2, 0.005],
+      ["pupilOffsetY", -0.12, 0.12, 0.005],
+      ["hairLength", 0, 60, 1],
+      ["noseShift", 0, 1, 0.01],
+      ["mouthCurve", -1.5, 1.5, 0.01],
+      ["mouthDownturn", -1, 1.2, 0.01],
+      ["mouthOpen", 0, 1, 0.001],
+      ["mouthWidthScale", 0.45, 1.3, 0.01],
+      ["angryMouth", 0, 2, 0.01],
+      ["mouthLift", -1, 3, 0.01]
+    ];
+
+    const expressionDefaults = {
+      angryMouth: 0,
+      eyeballSize: 1.0,
+      hairLength: 0,
+      noseShift: 0
+    };
+
+    const angryMouthMorphStart = 0.82;
+    const angryMouthLinePoint = 1.17;
+    const angryMouthMorphMax = 2.0;
+    const mouthOpenLegacyMax = 0.85;
+    const mouthOpenMax = 3.0;
+    const mouthOffsetX = -15;
+    const faceOffsetY = 120;
+    const lowMouthOpenTransitionStart = 0.06;
+    const lowMouthOpenTransitionEnd = 0.15;
+    const highOpenCapsuleWidthRatio = 0.46;
+    const highOpenCapsuleHeightRatio = 1.3;
+    const highOpenOvalStart = 0.22;
+    const highOpenOvalSubdivisionPasses = 1;
+
+    const customLoopValue = "__custom__";
+
+    let currentName = "neutral";
+    let currentExpression = { ...expressionDefaults, ...clonePreset(presets[currentName]) };
+    let loopFromName = currentName;
+    let loopToName = "neutral";
+    let loopFromUsesCustom = false;
+    let loopToUsesCustom = false;
+    let loopFromCustomExpression = clonePreset(currentExpression);
+    let loopToCustomExpression = getExpressionByName(loopToName);
+    let hasSliderChanges = false;
+    let previewAnimation = null;
+    const sliderEls = new Map();
+
+    function clonePreset(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function easeInOutCubic(t) {
+      return t < 0.5
+        ? 4 * t * t * t
+        : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function smoothstep(edge0, edge1, value) {
+      const t = clamp((value - edge0) / (edge1 - edge0), 0, 1);
+      return t * t * (3 - 2 * t);
+    }
+
+    function setPreviewButtons(isPlaying) {
+      previewLoopButton.textContent = isPlaying ? "Looping..." : "Loop Play";
+      stopPreviewButton.disabled = !isPlaying;
+      expressionSelect.disabled = isPlaying;
+      previewLoopTarget.disabled = isPlaying;
+      if (isPlaying) {
+        setLoopFromButton.disabled = true;
+        setLoopToButton.disabled = true;
+      } else {
+        syncLoopCaptureButtons();
+      }
+    }
+
+    function getExpressionByName(name) {
+      return normalizeDynamicExpressionConstraints({ ...expressionDefaults, ...clonePreset(presets[name]) });
+    }
+
+    function cancelPreviewAnimation({ keepCurrent = true } = {}) {
+      if (!previewAnimation) return;
+      previewAnimation = null;
+      if (!keepCurrent) {
+        currentExpression = resolveLoopFromExpression();
+        currentName = loopFromName;
+      }
+      setPreviewButtons(false);
+    }
+
+    function mixExpressions(fromExpression, toExpression, t) {
+      const mixed = {};
+      sliderDefs.forEach(([key]) => {
+        mixed[key] = lerp(fromExpression[key], toExpression[key], t);
+      });
+      return mixed;
+    }
+
+    function resolveLoopFromExpression() {
+      return loopFromUsesCustom
+        ? normalizeDynamicExpressionConstraints(clonePreset(loopFromCustomExpression))
+        : getExpressionByName(loopFromName);
+    }
+
+    function resolveLoopToExpression() {
+      return loopToUsesCustom
+        ? normalizeDynamicExpressionConstraints(clonePreset(loopToCustomExpression))
+        : getExpressionByName(loopToName);
+    }
+
+    function updateLoopSelectValues() {
+      expressionSelect.value = loopFromUsesCustom ? customLoopValue : loopFromName;
+      previewLoopTarget.value = loopToUsesCustom ? customLoopValue : loopToName;
+    }
+
+    function flashButtonLabel(button, label) {
+      const originalLabel = button.textContent;
+      button.textContent = label;
+      window.setTimeout(() => {
+        button.textContent = originalLabel;
+      }, 900);
+    }
+
+    function syncLoopCaptureButtons() {
+      if (previewAnimation) return;
+      setLoopFromButton.disabled = false;
+      setLoopToButton.disabled = false;
+    }
+
+    function runPreviewLoop(startExpression, endExpression, repeats) {
+      previewAnimation = {
+        startTime: performance.now(),
+        phaseDurationMs: 900,
+        startExpression: clonePreset(startExpression),
+        endExpression: clonePreset(endExpression),
+        repeats: Math.max(1, repeats)
+      };
+      currentName = loopFromName;
+      setPreviewButtons(true);
+    }
+
+    function shapeMouthOpen(value) {
+      const clamped = clamp(value, 0, mouthOpenMax);
+      if (clamped <= 0) return 0;
+
+      const minInput = 0.03;
+      if (clamped <= minInput) return 0;
+
+      if (clamped <= mouthOpenLegacyMax) {
+        const lowRangeBlend = smoothstep(lowMouthOpenTransitionStart, lowMouthOpenTransitionEnd, clamped);
+        const t = (clamped - minInput) / (mouthOpenLegacyMax - minInput);
+        return clamped * Math.pow(t, 2.55) * lerp(0.7, 0.9, lowRangeBlend);
+      }
+
+      // Preserve the old low/mid behavior, then ease into a rounder high-open shape.
+      const t = (clamped - mouthOpenLegacyMax) / (mouthOpenMax - mouthOpenLegacyMax);
+      return mouthOpenLegacyMax + 0.9 * Math.pow(t, 1.08);
+    }
+
+    function resolveMouthExpression(expression) {
+      const morph = clamp(expression.angryMouth ?? 0, 0, angryMouthMorphMax);
+      const mouthMorph = clamp(morph / angryMouthMorphStart, 0, 1);
+      if (mouthMorph <= 0) return expression;
+
+      const neutralMouth = presets.neutral;
+      const angryMouth = presets.angry;
+      return {
+        ...expression,
+        mouthCurve: expression.mouthCurve + (angryMouth.mouthCurve - neutralMouth.mouthCurve) * mouthMorph,
+        mouthDownturn: expression.mouthDownturn + (angryMouth.mouthDownturn - neutralMouth.mouthDownturn) * mouthMorph,
+        mouthOpen: expression.mouthOpen + (angryMouth.mouthOpen - neutralMouth.mouthOpen) * mouthMorph,
+        mouthWidthScale: expression.mouthWidthScale + (angryMouth.mouthWidthScale - neutralMouth.mouthWidthScale) * mouthMorph
+      };
+    }
+
+    function formatValue(value) {
+      return Number(value).toFixed(3).replace(/0+$/, "").replace(/\.$/, "");
+    }
+
+    function sliderValueToExpressionValue(key, sliderValue) {
+      if (key !== "mouthOpen") return Number(sliderValue);
+      const t = clamp(Number(sliderValue), 0, 1);
+      return 0.03 + (mouthOpenMax - 0.03) * Math.pow(t, 2.35);
+    }
+
+    function expressionValueToSliderValue(key, expressionValue) {
+      if (key !== "mouthOpen") return Number(expressionValue);
+      const normalized = clamp((Number(expressionValue) - 0.03) / (mouthOpenMax - 0.03), 0, 1);
+      return Math.pow(normalized, 1 / 2.35);
+    }
+
+    function getPupilMotionMetrics(expression = currentExpression) {
+      const resolvedExpression = expression ?? currentExpression;
+      const width = scaleW(firmware.eyeSocket.w);
+      const height = scaleH(firmware.eyeSocket.h) * (resolvedExpression.eyeSquash ?? 1);
+      const open = clamp(resolvedExpression.eyelidOpen ?? 1, 0.05, 1.25);
+      const eyeHeight = height * open;
+      const eyeballScale = clamp(resolvedExpression.eyeballSize ?? 1, 0.55, 1.55);
+      const globeRadius = Math.max(4, Math.min(width, Math.max(8, eyeHeight)) * 0.42 * eyeballScale);
+      const pupilScale = pupilScaleFromEyeSquash(resolvedExpression.eyeSquash ?? 1);
+      const desiredPupilRadius = width * (resolvedExpression.pupilSize ?? 0) * pupilScale;
+      const pupilRadius = Math.min(globeRadius * 0.98, desiredPupilRadius);
+      const pupilOffsetRange = Math.max(0, globeRadius - pupilRadius * 1.15);
+      return { width, globeRadius, pupilScale, pupilRadius, pupilOffsetRange };
+    }
+
+    function getDynamicSliderBounds(key, expression = currentExpression) {
+      const sliderDef = sliderDefs.find(([sliderKey]) => sliderKey === key);
+      if (!sliderDef) return null;
+
+      const [, min, max, step] = sliderDef;
+      if (!["pupilSize", "pupilOffsetX", "pupilOffsetY"].includes(key)) {
+        return { min, max, step };
+      }
+      const resolvedExpression = expression ?? currentExpression;
+      const { width, globeRadius, pupilScale, pupilRadius } = getPupilMotionMetrics(resolvedExpression);
+
+      if (key === "pupilSize") {
+        const dynamicMax = (globeRadius * 0.98) / (width * pupilScale);
+        return {
+          min,
+          max: Number(Math.max(min, dynamicMax).toFixed(3)),
+          step
+        };
+      }
+
+      const motionRadius = Math.max(0, globeRadius - pupilRadius * 1.15);
+      if (motionRadius <= 0) {
+        return { min: 0, max: 0, step };
+      }
+
+      const otherAxis = key === "pupilOffsetX"
+        ? clamp(resolvedExpression.pupilOffsetY ?? 0, -1, 1)
+        : clamp(resolvedExpression.pupilOffsetX ?? 0, -1, 1);
+      const dynamicMax = Math.sqrt(Math.max(0, 1 - otherAxis * otherAxis));
+      return {
+        min: Number((-dynamicMax).toFixed(3)),
+        max: Number(dynamicMax.toFixed(3)),
+        step
+      };
+    }
+
+    function normalizeDynamicExpressionConstraints(expression) {
+      const pupilBounds = getDynamicSliderBounds("pupilSize", expression);
+      if (pupilBounds) {
+        expression.pupilSize = clamp(expression.pupilSize ?? pupilBounds.min, pupilBounds.min, pupilBounds.max);
+      }
+      const pupilOffsetXBounds = getDynamicSliderBounds("pupilOffsetX", expression);
+      if (pupilOffsetXBounds) {
+        expression.pupilOffsetX = clamp(expression.pupilOffsetX ?? 0, pupilOffsetXBounds.min, pupilOffsetXBounds.max);
+      }
+      const pupilOffsetYBounds = getDynamicSliderBounds("pupilOffsetY", expression);
+      if (pupilOffsetYBounds) {
+        expression.pupilOffsetY = clamp(expression.pupilOffsetY ?? 0, pupilOffsetYBounds.min, pupilOffsetYBounds.max);
+      }
+      return expression;
+    }
+
+    function createSliders() {
+      sliderDefs.forEach(([key, min, max, step]) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "control-group";
+
+        const row = document.createElement("div");
+        row.className = "row";
+
+        const label = document.createElement("label");
+        label.htmlFor = key;
+        label.textContent = key;
+
+        const value = document.createElement("span");
+        value.className = "value";
+
+        const input = document.createElement("input");
+        input.type = "range";
+        input.id = key;
+        const bounds = getDynamicSliderBounds(key, currentExpression) ?? { min, max, step };
+        input.min = bounds.min;
+        input.max = bounds.max;
+        input.step = bounds.step;
+        input.addEventListener("input", () => {
+          cancelPreviewAnimation();
+          currentExpression[key] = sliderValueToExpressionValue(key, input.value);
+          normalizeDynamicExpressionConstraints(currentExpression);
+          hasSliderChanges = true;
+          value.textContent = formatValue(currentExpression[key]);
+          render();
+        });
+
+        row.append(label, value);
+        wrapper.append(row, input);
+        sliderPanel.append(wrapper);
+        sliderEls.set(key, { input, value });
+      });
+    }
+
+    function syncSliders() {
+      updateLoopSelectValues();
+      sliderDefs.forEach(([key]) => {
+        const slider = sliderEls.get(key);
+        const bounds = getDynamicSliderBounds(key, currentExpression);
+        if (bounds) {
+          slider.input.min = bounds.min;
+          slider.input.max = bounds.max;
+          slider.input.step = bounds.step;
+        }
+        normalizeDynamicExpressionConstraints(currentExpression);
+        slider.input.value = expressionValueToSliderValue(key, currentExpression[key]);
+        slider.value.textContent = formatValue(currentExpression[key]);
+      });
+      jsonOutput.value = JSON.stringify({
+        name: currentName,
+        baseFace,
+        objects: baseFaceObjects,
+        expression: currentExpression
+      }, null, 2);
+    }
+
+    function drawBezierObject(targetCtx, object, transform) {
+      const mapPoint = ([x, y]) => [
+        transform.offsetX + x * transform.scaleX,
+        transform.offsetY + y * transform.scaleY
+      ];
+
+      const [startX, startY] = mapPoint(object.start);
+      targetCtx.beginPath();
+      targetCtx.moveTo(startX, startY);
+      object.segments.forEach((segment) => {
+        const [c1x, c1y] = mapPoint([segment[0], segment[1]]);
+        const [c2x, c2y] = mapPoint([segment[2], segment[3]]);
+        const [x, y] = mapPoint([segment[4], segment[5]]);
+        targetCtx.bezierCurveTo(c1x, c1y, c2x, c2y, x, y);
+      });
+      targetCtx.stroke();
+    }
+
+    function fillBezierObject(targetCtx, object, transform) {
+      const mapPoint = ([x, y]) => [
+        transform.offsetX + x * transform.scaleX,
+        transform.offsetY + y * transform.scaleY
+      ];
+
+      const [startX, startY] = mapPoint(object.start);
+      targetCtx.beginPath();
+      targetCtx.moveTo(startX, startY);
+      object.segments.forEach((segment) => {
+        const [c1x, c1y] = mapPoint([segment[0], segment[1]]);
+        const [c2x, c2y] = mapPoint([segment[2], segment[3]]);
+        const [x, y] = mapPoint([segment[4], segment[5]]);
+        targetCtx.bezierCurveTo(c1x, c1y, c2x, c2y, x, y);
+      });
+      targetCtx.closePath();
+      targetCtx.fill();
+    }
+
+    function drawEyeGlobe(targetCtx, globe, transform, fillStyle = "#ffffff", strokeStyle = "#c8c1b9") {
+      const cx = transform.offsetX + globe.center[0] * transform.scaleX;
+      const cy = transform.offsetY + globe.center[1] * transform.scaleY;
+      const radius = Math.max(4, globe.radius * ((transform.scaleX + transform.scaleY) * 0.5));
+
+      targetCtx.save();
+      targetCtx.fillStyle = fillStyle;
+      targetCtx.beginPath();
+      targetCtx.arc(cx, cy, radius, 0, Math.PI * 2);
+      targetCtx.fill();
+      targetCtx.strokeStyle = strokeStyle;
+      targetCtx.lineWidth = Math.max(2, transform.scaleX * 3);
+      targetCtx.stroke();
+      targetCtx.restore();
+    }
+
+    function drawPolylineObject(targetCtx, points, transform) {
+      if (!points || points.length < 2) return;
+
+      targetCtx.beginPath();
+      points.forEach(([x, y], index) => {
+        const mappedX = transform.offsetX + x * transform.scaleX;
+        const mappedY = transform.offsetY + y * transform.scaleY;
+        if (index === 0) targetCtx.moveTo(mappedX, mappedY);
+        else targetCtx.lineTo(mappedX, mappedY);
+      });
+      targetCtx.stroke();
+    }
+
+    function mapBezierObjectPoints(object, pointMapper) {
+      return {
+        start: pointMapper(object.start, "start", -1),
+        segments: object.segments.map((segment, index) => {
+          const c1 = pointMapper([segment[0], segment[1]], "control1", index);
+          const c2 = pointMapper([segment[2], segment[3]], "control2", index);
+          const end = pointMapper([segment[4], segment[5]], "end", index);
+          return [c1[0], c1[1], c2[0], c2[1], end[0], end[1]];
+        })
+      };
+    }
+
+    function createEllipseBezierObject(cx, cy, rx, ry) {
+      const k = 0.552284749831;
+      return {
+        start: [cx + rx, cy],
+        segments: [
+          [cx + rx, cy + ry * k, cx + rx * k, cy + ry, cx, cy + ry],
+          [cx - rx * k, cy + ry, cx - rx, cy + ry * k, cx - rx, cy],
+          [cx - rx, cy - ry * k, cx - rx * k, cy - ry, cx, cy - ry],
+          [cx + rx * k, cy - ry, cx + rx, cy - ry * k, cx + rx, cy]
+        ]
+      };
+    }
+
+    function projectPointToEllipse(point, cx, cy, rx, ry) {
+      const dx = point[0] - cx;
+      const dy = point[1] - cy;
+      if (dx === 0 && dy === 0) return [cx, cy];
+
+      const scale = 1 / Math.sqrt((dx * dx) / (rx * rx) + (dy * dy) / (ry * ry));
+      return [cx + dx * scale, cy + dy * scale];
+    }
+
+    function morphBezierObjectToEllipse(object, cx, cy, rx, ry, blend) {
+      return mapBezierObjectPoints(object, (point) => {
+        const ellipsePoint = projectPointToEllipse(point, cx, cy, rx, ry);
+        return [
+          lerp(point[0], ellipsePoint[0], blend),
+          lerp(point[1], ellipsePoint[1], blend)
+        ];
+      });
+    }
+
+    function splitCubicBezier(p0, p1, p2, p3) {
+      const p01 = [lerp(p0[0], p1[0], 0.5), lerp(p0[1], p1[1], 0.5)];
+      const p12 = [lerp(p1[0], p2[0], 0.5), lerp(p1[1], p2[1], 0.5)];
+      const p23 = [lerp(p2[0], p3[0], 0.5), lerp(p2[1], p3[1], 0.5)];
+      const p012 = [lerp(p01[0], p12[0], 0.5), lerp(p01[1], p12[1], 0.5)];
+      const p123 = [lerp(p12[0], p23[0], 0.5), lerp(p12[1], p23[1], 0.5)];
+      const pMid = [lerp(p012[0], p123[0], 0.5), lerp(p012[1], p123[1], 0.5)];
+
+      return [
+        [p01[0], p01[1], p012[0], p012[1], pMid[0], pMid[1]],
+        [p123[0], p123[1], p23[0], p23[1], p3[0], p3[1]]
+      ];
+    }
+
+    function subdivideBezierObject(object, passes = 1) {
+      let result = object;
+      for (let pass = 0; pass < passes; pass += 1) {
+        const nextSegments = [];
+        let currentStart = result.start;
+        result.segments.forEach((segment) => {
+          const p0 = currentStart;
+          const p1 = [segment[0], segment[1]];
+          const p2 = [segment[2], segment[3]];
+          const p3 = [segment[4], segment[5]];
+          const [left, right] = splitCubicBezier(p0, p1, p2, p3);
+          nextSegments.push(left, right);
+          currentStart = p3;
+        });
+        result = {
+          start: result.start,
+          segments: nextSegments
+        };
+      }
+      return result;
+    }
+
+    function createVerticalCapsuleBezierObject(cx, cy, rx, straightHalf) {
+      const k = 0.552284749831;
+      const topCy = cy - straightHalf;
+      const bottomCy = cy + straightHalf;
+      return {
+        start: [cx + rx, topCy],
+        segments: [
+          [cx + rx, topCy - rx * k, cx + rx * k, topCy - rx, cx, topCy - rx],
+          [cx - rx * k, topCy - rx, cx - rx, topCy - rx * k, cx - rx, topCy],
+          [cx - rx, topCy + straightHalf * 0.66, cx - rx, bottomCy - straightHalf * 0.66, cx - rx, bottomCy],
+          [cx - rx, bottomCy + rx * k, cx - rx * k, bottomCy + rx, cx, bottomCy + rx],
+          [cx + rx * k, bottomCy + rx, cx + rx, bottomCy + rx * k, cx + rx, bottomCy],
+          [cx + rx, bottomCy - straightHalf * 0.66, cx + rx, topCy + straightHalf * 0.66, cx + rx, topCy]
+        ]
+      };
+    }
+    // Copyright 2025 Paul Hodara All Rights Reserved
+
+    function objectBounds(object) {
+      const points = [object.start];
+      object.segments.forEach((segment) => {
+        points.push([segment[0], segment[1]], [segment[2], segment[3]], [segment[4], segment[5]]);
+      });
+      const xs = points.map((point) => point[0]);
+      const ys = points.map((point) => point[1]);
+      return {
+        minX: Math.min(...xs),
+        maxX: Math.max(...xs),
+        minY: Math.min(...ys),
+        maxY: Math.max(...ys),
+        centerX: (Math.min(...xs) + Math.max(...xs)) / 2,
+        centerY: (Math.min(...ys) + Math.max(...ys)) / 2
+      };
+    }
+
+    function transformObject(object, transformer) {
+      const bounds = objectBounds(object);
+      return mapBezierObjectPoints(object, (point, role, index) => transformer(point, bounds, role, index));
+    }
+
+    function offsetBezierObject(object, dx, dy = 0) {
+      return mapBezierObjectPoints(object, (point) => [point[0] + dx, point[1] + dy]);
+    }
+
+    function scaleBezierObject(object, axisX, axisY, scaleX, scaleY) {
+      return mapBezierObjectPoints(object, (point) => [
+        axisX + (point[0] - axisX) * scaleX,
+        axisY + (point[1] - axisY) * scaleY
+      ]);
+    }
+
+    function pupilScaleFromEyeSquash(eyeSquash) {
+      return Math.pow(clamp(eyeSquash, 0.25, 1.25), 0.7);
+    }
+
+    function eyeScaleMetrics(expression) {
+      return {
+        eyeScaleY: clamp(expression.eyelidOpen * expression.eyeSquash, 0.14, 1.45),
+        eyeScaleX: 1 + (1 - clamp(expression.eyeSquash, 0.25, 1.25)) * 0.08
+      };
+    }
+
+    function createPupilObject(eyeObject, baseEyeObject, expression) {
+      const sharedEyeWidth = firmware.eyeSocket.w * 16;
+      const pupilScale = pupilScaleFromEyeSquash(expression.eyeSquash);
+      const globe = createEyeGlobeObject(eyeObject, baseEyeObject, expression);
+      const desiredRadius = Math.max(6, sharedEyeWidth * expression.pupilSize * 0.28 * pupilScale);
+      const radius = Math.min(globe.radius * 0.98, desiredRadius);
+      const offsetRange = Math.max(0, globe.radius - radius * 1.15);
+      return {
+        center: [
+          globe.center[0] + expression.pupilOffsetX * offsetRange,
+          globe.center[1] + expression.pupilOffsetY * offsetRange
+        ],
+        radius
+      };
+    }
+
+    function createEyeGlobeObject(eyeObject, baseEyeObject, expression) {
+      const bounds = objectBounds(eyeObject);
+      const baseBounds = objectBounds(baseEyeObject);
+      const { eyeScaleX, eyeScaleY } = eyeScaleMetrics(expression);
+      const eyeWidth = (baseBounds.maxX - baseBounds.minX) * eyeScaleX;
+      const eyeHeight = (baseBounds.maxY - baseBounds.minY) * eyeScaleY;
+      const eyeballScale = clamp(expression.eyeballSize ?? 1, 0.55, 1.55);
+      return {
+        center: [bounds.centerX, bounds.centerY],
+        radius: Math.max(4, Math.min(eyeWidth, eyeHeight) * 0.24 * eyeballScale)
+      };
+    }
+
+    function createExpressionObjects() {
+      const expression = resolveMouthExpression(currentExpression);
+      const noseShift = clamp(currentExpression.noseShift ?? 0, 0, 1);
+      const morphValue = clamp(currentExpression.angryMouth ?? 0, 0, angryMouthMorphMax);
+      const angryWaveMorph = clamp((morphValue - angryMouthMorphStart) / (angryMouthMorphMax - angryMouthMorphStart), 0, 1);
+      const shapedMouthOpen = shapeMouthOpen(expression.mouthOpen);
+      const mouthOpenBlend = smoothstep(lowMouthOpenTransitionStart, lowMouthOpenTransitionEnd, expression.mouthOpen);
+      const mouthFormBlend = Math.pow(mouthOpenBlend, 1.45);
+      const closedMouthBlend = 1 - mouthFormBlend;
+      const highOpenRoundness = clamp(
+        (expression.mouthOpen - mouthOpenLegacyMax) / (mouthOpenMax - mouthOpenLegacyMax),
+        0,
+        1
+      );
+      const browLiftPx = -expression.browLift * 120;
+      const browCurvePx = expression.browCurve * 230;
+      const browTiltPx = expression.browTilt * 56;
+      const eyeTiltRad = expression.eyeTilt * 0.8;
+      const { eyeScaleY, eyeScaleX } = eyeScaleMetrics(expression);
+      const frownAmount = Math.max(0, expression.mouthDownturn);
+      const smileAmount = Math.max(0, -expression.mouthDownturn);
+      const mouthCurveResponse = Math.sign(expression.mouthCurve) * Math.pow(Math.abs(expression.mouthCurve), 0.9);
+      const mouthScaleX = (expression.mouthWidthScale + smileAmount * 0.13) * (1 - highOpenRoundness * 0.34);
+      const openFrownSoftening = 1 - mouthFormBlend * 0.55 - highOpenRoundness * 0.2;
+      const softenedFrownAmount = frownAmount * Math.max(0.18, openFrownSoftening);
+      const mouthScaleY = 1 + shapedMouthOpen * 0.32 + highOpenRoundness * 0.62 + smileAmount * 0.22 - softenedFrownAmount * 0.34;
+      const mouthCurvePx = mouthCurveResponse * 142;
+      const mouthDownturnPx = softenedFrownAmount * 105;
+      const mouthSmilePx = smileAmount * 118;
+      const mouthLiftOffsetY = -expression.mouthLift * 10;
+
+      const adjustBrow = (object, isLeft) => transformObject(object, (point, bounds, role) => {
+        const xNorm = bounds.maxX === bounds.minX ? 0 : (point[0] - bounds.centerX) / ((bounds.maxX - bounds.minX) / 2);
+        const pointWeight = role === "start" || role === "end" ? 0.82 : 1.06;
+        const archProfile = Math.pow(Math.max(0, 1 - xNorm * xNorm), 1.9);
+        const directionalTilt = xNorm * browTiltPx * (isLeft ? 1 : -1);
+        const smoothArch = -archProfile * browCurvePx * pointWeight;
+        return [point[0], point[1] + browLiftPx + directionalTilt + smoothArch];
+      });
+
+      const adjustEye = (object, sideSign) => transformObject(object, (point, bounds) => {
+        const dx = point[0] - bounds.centerX;
+        const dy = (point[1] - bounds.centerY) * eyeScaleY;
+        const angle = eyeTiltRad * sideSign;
+        const rotX = dx * Math.cos(angle) - dy * Math.sin(angle);
+        const rotY = dx * Math.sin(angle) + dy * Math.cos(angle);
+        return [
+          bounds.centerX + rotX * eyeScaleX,
+          bounds.centerY + rotY
+        ];
+      });
+
+      const adjustMouth = (object) => transformObject(object, (point, bounds) => {
+        const xNorm = bounds.maxX === bounds.minX ? 0 : (point[0] - bounds.centerX) / ((bounds.maxX - bounds.minX) / 2);
+        const cornerWeight = Math.pow(Math.abs(xNorm), 1.45);
+        const centerCurveWeight = Math.pow(Math.max(0, 1 - xNorm * xNorm), 1.1);
+        const curveProfile = centerCurveWeight * (1 - Math.abs(xNorm) * 0.08);
+        const smileArc = curveProfile * mouthCurvePx;
+        const edgeDrop = cornerWeight * mouthDownturnPx * mouthFormBlend;
+        const centerWeight = 1 - Math.pow(Math.abs(xNorm), 1.2);
+        const cornerBias = Math.pow(Math.abs(xNorm), 2.1) * mouthDownturnPx * 0.42 * mouthFormBlend;
+        const centerLift = centerWeight * mouthDownturnPx * 0.88 * mouthFormBlend;
+        const dx = point[0] - bounds.centerX;
+        const dy = point[1] - bounds.centerY;
+        const smileCornerLift = cornerWeight * mouthSmilePx * 1.42 * mouthFormBlend;
+        const smileCenterDip = centerWeight * mouthSmilePx * 0.52 * mouthFormBlend;
+        const lipCompression = 1 - softenedFrownAmount * 0.34;
+        const isUpperLip = point[1] < bounds.centerY;
+        const upperLipCrescent = isUpperLip
+          ? (Math.pow(Math.abs(xNorm), 1.9) * mouthDownturnPx * 0.1
+            + (1 - xNorm * xNorm) * mouthDownturnPx * 0.82) * mouthFormBlend
+          : 0;
+        const lipDistance = Math.abs(dy);
+        const convergence = Math.min(18, lipDistance * 0.3) * softenedFrownAmount * mouthFormBlend;
+        const convergenceOffset = isUpperLip ? convergence : -convergence;
+        const sideDrop = edgeDrop + cornerBias;
+        const transformedY = bounds.centerY + dy * mouthScaleY * lipCompression + convergenceOffset + smileArc + sideDrop - centerLift + upperLipCrescent - smileCornerLift + smileCenterDip + mouthLiftOffsetY * 1.5;
+        const closedCornerDrop = Math.pow(Math.abs(xNorm), 1.65) * mouthDownturnPx * 0.7 * closedMouthBlend;
+        const closedCenterLift = (1 - Math.pow(Math.abs(xNorm), 1.1)) * mouthDownturnPx * 0.2 * closedMouthBlend;
+        const closedSmileCornerLift = Math.pow(Math.abs(xNorm), 1.65) * mouthSmilePx * 1.08 * closedMouthBlend;
+        const closedSmileCenterDip = (1 - Math.pow(Math.abs(xNorm), 1.08)) * mouthSmilePx * 0.24 * closedMouthBlend;
+        const closedCurveArc = curveProfile * mouthCurvePx;
+        const flatLipY = bounds.centerY + mouthLiftOffsetY * 1.5 + closedCurveArc + closedCornerDrop - closedCenterLift - closedSmileCornerLift + closedSmileCenterDip;
+        return [
+          bounds.centerX + dx * mouthScaleX,
+          lerp(flatLipY, transformedY, mouthFormBlend)
+        ];
+      });
+
+      const adjustNose = (object, sideSign) => transformObject(object, (point, bounds) => {
+        const narrowedX = sideSign > 0
+          ? bounds.centerX + (point[0] - bounds.centerX) * 0.8
+          : point[0] + 10;
+        return [
+          narrowedX,
+          point[1]
+        ];
+      });
+
+      const leftEye = adjustEye(baseFaceObjects.leftEye, -1);
+      const rightEye = adjustEye(baseFaceObjects.rightEye, 1);
+      const neutralLeftNose = adjustNose(baseFaceObjects.leftNose, -1);
+      const neutralRightNose = adjustNose(baseFaceObjects.rightNose, 1);
+      const leftNoseBounds = objectBounds(neutralLeftNose);
+      const rightNoseBounds = objectBounds(neutralRightNose);
+      const noseAxisX = (leftNoseBounds.maxX + rightNoseBounds.minX) / 2;
+      const noseAxisY = (
+        leftNoseBounds.centerY
+        + rightNoseBounds.centerY
+      ) / 2;
+      const leftNoseWidth = Math.max(1, noseAxisX - leftNoseBounds.minX);
+      const rightNoseWidth = Math.max(1, rightNoseBounds.maxX - noseAxisX);
+      const leftNoseHeight = Math.max(1, leftNoseBounds.maxY - leftNoseBounds.minY);
+      const rightNoseHeight = Math.max(1, rightNoseBounds.maxY - rightNoseBounds.minY);
+      const leftNoseScaleX = lerp(1, rightNoseWidth / leftNoseWidth, noseShift);
+      const rightNoseScaleX = lerp(1, leftNoseWidth / rightNoseWidth, noseShift);
+      const leftNoseScaleY = lerp(1, rightNoseHeight / leftNoseHeight, noseShift);
+      const rightNoseScaleY = lerp(1, leftNoseHeight / rightNoseHeight, noseShift);
+      const leftNoseScaled = scaleBezierObject(neutralLeftNose, noseAxisX, noseAxisY, leftNoseScaleX, leftNoseScaleY);
+      const rightNoseScaled = scaleBezierObject(neutralRightNose, noseAxisX, noseAxisY, rightNoseScaleX, rightNoseScaleY);
+      const leftNose = offsetBezierObject(leftNoseScaled, -25, noseAxisY - objectBounds(leftNoseScaled).centerY);
+      const rightNose = offsetBezierObject(rightNoseScaled, -25, noseAxisY - objectBounds(rightNoseScaled).centerY);
+      let mouth = offsetBezierObject(adjustMouth(baseFaceObjects.mouth), mouthOffsetX, 0);
+      let mouthLine = null;
+
+      if (highOpenRoundness > highOpenOvalStart && angryWaveMorph === 0) {
+        mouth = subdivideBezierObject(mouth, highOpenOvalSubdivisionPasses);
+        const mouthBounds = objectBounds(mouth);
+        const capsuleBlend = smoothstep(highOpenOvalStart, 1, highOpenRoundness);
+        const width = mouthBounds.maxX - mouthBounds.minX;
+        const capsuleRx = (width * (1 - capsuleBlend * 0.12) * highOpenCapsuleWidthRatio) / 2;
+        const capsuleRy = lerp(capsuleRx, capsuleRx * highOpenCapsuleHeightRatio, capsuleBlend);
+        mouth = morphBezierObjectToEllipse(
+          mouth,
+          mouthBounds.centerX,
+          mouthBounds.centerY + capsuleBlend * 10,
+          capsuleRx,
+          capsuleRy,
+          capsuleBlend
+        );
+      }
+
+      if (angryWaveMorph > 0) {
+        const mouthBounds = objectBounds(mouth);
+        const flattenBlend = clamp(
+          (morphValue - angryMouthMorphStart) / (angryMouthLinePoint - angryMouthMorphStart),
+          0,
+          1
+        );
+        const waveBlend = clamp(
+          (morphValue - angryMouthLinePoint) / (angryMouthMorphMax - angryMouthLinePoint),
+          0,
+          1
+        );
+          const baselineY = mouthBounds.centerY + mouthLiftOffsetY * 1.5 - 2;
+        mouthLine = Array.from({ length: 49 }, (_, index) => {
+          const t = index / 48;
+          const x = lerp(mouthBounds.minX, mouthBounds.maxX, t);
+          const xNorm = t * 2 - 1;
+          const tiltOffset = -xNorm * 28 * angryWaveMorph;
+          const waveOffset = Math.sin(t * Math.PI * 2) * 72 * waveBlend;
+          const y = baselineY + tiltOffset + waveOffset;
+          return [
+            x,
+            lerp(mouthBounds.centerY, y, flattenBlend)
+          ];
+        });
+      }
+
+      return {
+        leftBrow: adjustBrow(baseFaceObjects.leftBrow, true),
+        rightBrow: adjustBrow(baseFaceObjects.rightBrow, false),
+        leftEye,
+        rightEye,
+        leftEyeGlobe: createEyeGlobeObject(leftEye, baseFaceObjects.leftEye, expression),
+        rightEyeGlobe: createEyeGlobeObject(rightEye, baseFaceObjects.rightEye, expression),
+        leftNose,
+        rightNose,
+        mouth,
+        mouthLine,
+        leftPupil: createPupilObject(leftEye, baseFaceObjects.leftEye, expression),
+        rightPupil: createPupilObject(rightEye, baseFaceObjects.rightEye, expression)
+      };
+    }
+
+    function drawPupil(targetCtx, pupil, transform) {
+      const x = transform.offsetX + pupil.center[0] * transform.scaleX;
+      const y = transform.offsetY + pupil.center[1] * transform.scaleY;
+      const radius = pupil.radius * ((transform.scaleX + transform.scaleY) * 0.5);
+      const blueRadius = radius;
+
+      targetCtx.save();
+      targetCtx.fillStyle = "#2d63ff";
+      targetCtx.beginPath();
+      targetCtx.arc(x, y, blueRadius, 0, Math.PI * 2);
+      targetCtx.fill();
+
+      targetCtx.fillStyle = "#165b8c";
+      targetCtx.beginPath();
+      targetCtx.arc(x, y, blueRadius * 0.72, 0, Math.PI * 2);
+      targetCtx.fill();
+
+      targetCtx.fillStyle = "#0f0d0c";
+      targetCtx.beginPath();
+      targetCtx.arc(x, y, blueRadius * 0.3, 0, Math.PI * 2);
+      targetCtx.fill();
+
+      targetCtx.fillStyle = "rgba(255,255,255,0.92)";
+      targetCtx.beginPath();
+      targetCtx.arc(x - blueRadius * 0.28, y - blueRadius * 0.28, blueRadius * 0.16, 0, Math.PI * 2);
+      targetCtx.fill();
+      targetCtx.restore();
+    }
+
+    function getFaceTransform() {
+      const faceBounds = { x: 66, y: 123, w: 462, h: 677 };
+      const availableW = canvas.width * 0.624;
+      const availableH = canvas.height * 0.624;
+      const scale = Math.min(availableW / faceBounds.w, availableH / faceBounds.h);
+      const width = faceBounds.w * scale;
+      const height = faceBounds.h * scale;
+      const offsetX = (canvas.width - width) / 2 - faceBounds.x * scale;
+      const offsetY = (canvas.height - height) / 2 - faceBounds.y * scale + faceOffsetY;
+      return { offsetX, offsetY, scaleX: scale, scaleY: scale };
+    }
+
+    function drawMainBaseFace() {
+      const transform = getFaceTransform();
+
+      ctx.save();
+      ctx.strokeStyle = "#1b1a18";
+      ctx.lineWidth = 6 * transform.scaleX;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.fillStyle = "#ffffff";
+
+      const faceObjects = createExpressionObjects();
+      drawBezierObject(ctx, faceObjects.leftBrow, transform);
+      drawBezierObject(ctx, faceObjects.rightBrow, transform);
+      drawBezierObject(ctx, faceObjects.leftEye, transform);
+      drawBezierObject(ctx, faceObjects.rightEye, transform);
+      drawEyeGlobe(ctx, faceObjects.leftEyeGlobe, transform);
+      drawEyeGlobe(ctx, faceObjects.rightEyeGlobe, transform);
+      drawPupil(ctx, faceObjects.leftPupil, transform);
+      drawPupil(ctx, faceObjects.rightPupil, transform);
+      drawBezierObject(ctx, faceObjects.leftNose, transform);
+      drawBezierObject(ctx, faceObjects.rightNose, transform);
+      if (faceObjects.mouthLine) drawPolylineObject(ctx, faceObjects.mouthLine, transform);
+      else drawBezierObject(ctx, faceObjects.mouth, transform);
+      ctx.restore();
+    }
+
+    function scaleX(x) {
+      return x / firmware.screenW * canvas.width;
+    }
+
+    function scaleY(y) {
+      return y / firmware.screenH * canvas.height;
+    }
+
+    function scaleW(w) {
+      return w / firmware.screenW * canvas.width;
+    }
+
+    function scaleH(h) {
+      return h / firmware.screenH * canvas.height;
+    }
+
+    function regionCenter(region) {
+      return {
+        x: scaleX(region.x + region.w / 2),
+        y: scaleY(region.y + region.h / 2)
+      };
+    }
+
+    function drawGrid() {
+      ctx.save();
+      ctx.strokeStyle = "rgba(25, 21, 18, 0.06)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= firmware.screenW; x += 20) {
+        ctx.beginPath();
+        ctx.moveTo(scaleX(x), 0);
+        ctx.lineTo(scaleX(x), canvas.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= firmware.screenH; y += 20) {
+        ctx.beginPath();
+        ctx.moveTo(0, scaleY(y));
+        ctx.lineTo(canvas.width, scaleY(y));
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawFacePlate() {
+      const { head, nose } = firmware;
+
+      ctx.save();
+      ctx.fillStyle = "#12100e";
+      roundedRect(ctx, scaleX(head.x), scaleY(head.y), scaleW(head.w), scaleH(head.h), scaleW(head.r), true, false);
+
+      ctx.strokeStyle = "#4a433d";
+      ctx.lineWidth = 6;
+      roundedRect(ctx, scaleX(head.x), scaleY(head.y), scaleW(head.w), scaleH(head.h), scaleW(head.r), false, true);
+
+      ctx.fillStyle = "rgba(255,255,255,0.04)";
+      roundedRect(
+        ctx,
+        scaleX(head.x + 8),
+        scaleY(head.y + 10),
+        scaleW(head.w - 16),
+        scaleH(head.h - 30),
+        scaleW(head.r - 8),
+        true,
+        false
+      );
+
+      ctx.fillStyle = "#db5a35";
+      ctx.beginPath();
+      ctx.arc(
+        scaleX(nose.x + nose.w / 2),
+        scaleY(nose.y + nose.h / 2),
+        Math.max(6, scaleH(nose.h)),
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawHair() {
+      const { hairRegion } = firmware;
+      const now = performance.now() * 0.001;
+      const transform = getFaceTransform();
+      const faceObjects = createExpressionObjects();
+
+      ctx.save();
+      ctx.strokeStyle = "#f0c449";
+      ctx.lineWidth = 4;
+      ctx.lineCap = "round";
+
+      // Short wavy hair with 8 strands, expanded horizontally by 4× and centered on the eye centerline
+      const strandSpacing = 56;
+      const numStrands = 8;
+      const totalSpan = (numStrands - 1) * strandSpacing;
+
+      const eyesCenterX = transform.offsetX + (((faceObjects.leftEyeGlobe.center[0] + faceObjects.rightEyeGlobe.center[0]) / 2) * transform.scaleX);
+      const startX = eyesCenterX - totalSpan / 2;
+
+      const hairLift = 5;
+      const hairLength = Math.max(0, currentExpression.hairLength ?? 0);
+      const baseTopY = hairRegion.y - 8 + hairLift;
+      const baseBottomY = hairRegion.y + 7 + hairLift;
+      const topY = baseTopY - hairLength;
+      for (let strand = 0; strand < numStrands; strand += 1) {
+        const baseX = startX + strand * strandSpacing;
+        let prevX = baseX;
+        let prevY = scaleY(topY);
+        for (let step = 1; step <= 5; step += 1) {
+          const y = lerp(topY, baseBottomY, step / 5);
+          const taper = step / 5;
+          const phase = now * 3.5 + step * 0.55 + strand * 0.7;
+          const x = baseX + Math.sin(phase) * (2.0 + taper * 1.5);
+          const drawY = scaleY(y);
+          ctx.beginPath();
+          ctx.moveTo(prevX, prevY);
+          ctx.lineTo(x, drawY);
+          ctx.stroke();
+          prevX = x;
+          prevY = drawY;
+        }
+      }
+
+      ctx.restore();
+    }
+
+    function drawEars() {
+      const earRegions = [firmware.leftEarRegion, firmware.rightEarRegion];
+      ctx.save();
+      ctx.strokeStyle = "rgba(244, 240, 232, 0.92)";
+      ctx.lineWidth = 4;
+      ctx.lineCap = "round";
+
+      earRegions.forEach((ear, index) => {
+        const isRight = index === 1;
+        const x = scaleX(ear.x + ear.w / 2);
+        const top = scaleY(ear.y);
+        const mid = scaleY(ear.y + ear.h * 0.45);
+        const bottom = scaleY(ear.y + ear.h);
+        const flare = scaleW(ear.w * 0.45);
+
+        ctx.beginPath();
+        ctx.moveTo(x, top);
+        ctx.quadraticCurveTo(x + (isRight ? flare : -flare), mid, x, bottom);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(x, top + 10);
+        ctx.quadraticCurveTo(x + (isRight ? flare * 0.5 : -flare * 0.5), mid, x, bottom - 12);
+        ctx.stroke();
+      });
+
+      ctx.restore();
+    }
+
+    function drawConstructionOverlay() {
+      if (!baseFace.showConstruction) return;
+
+      const regions = [
+        ["HEAD", firmware.head, "rgba(255,255,255,0.16)"],
+        ["HAIR", firmware.hairRegion, "rgba(240,196,73,0.18)"],
+        ["L-EYE", firmware.leftEyeRegion, "rgba(13,110,110,0.16)"],
+        ["R-EYE", firmware.rightEyeRegion, "rgba(13,110,110,0.16)"],
+        ["MOUTH", firmware.mouthRegion, "rgba(217,93,57,0.16)"],
+        ["L-EAR", firmware.leftEarRegion, "rgba(255,255,255,0.12)"],
+        ["R-EAR", firmware.rightEarRegion, "rgba(255,255,255,0.12)"]
+      ];
+
+      ctx.save();
+      ctx.font = '600 15px "Avenir Next", "Segoe UI", sans-serif';
+      ctx.textBaseline = "top";
+
+      regions.forEach(([label, region, fill]) => {
+        ctx.fillStyle = fill;
+        ctx.strokeStyle = "rgba(255,255,255,0.22)";
+        ctx.lineWidth = 2;
+        ctx.fillRect(scaleX(region.x), scaleY(region.y), scaleW(region.w), scaleH(region.h));
+        ctx.strokeRect(scaleX(region.x), scaleY(region.y), scaleW(region.w), scaleH(region.h));
+        ctx.fillStyle = "rgba(255,255,255,0.72)";
+        ctx.fillText(label, scaleX(region.x) + 6, scaleY(region.y) + 6);
+      });
+      ctx.restore();
+    }
+
+    function drawEye(side) {
+      const region = side === "left" ? firmware.leftEyeRegion : firmware.rightEyeRegion;
+      const socket = firmware.eyeSocket;
+      const cx = scaleX(region.x + socket.ox + socket.w / 2);
+      const cy = scaleY(region.y + socket.oy + socket.h / 2);
+      const width = scaleW(socket.w);
+      const height = scaleH(socket.h) * currentExpression.eyeSquash;
+      const open = clamp(currentExpression.eyelidOpen, 0.05, 1.25);
+      const eyeHeight = height * open;
+      const eyeballScale = clamp(currentExpression.eyeballSize ?? 1, 0.55, 1.55);
+
+      ctx.save();
+
+      const globeRadius = Math.max(4, Math.min(width, Math.max(8, eyeHeight)) * 0.42 * eyeballScale);
+      const desiredPupilRadius = width * currentExpression.pupilSize * pupilScaleFromEyeSquash(currentExpression.eyeSquash);
+      const pupilRadius = Math.min(globeRadius * 0.98, desiredPupilRadius);
+      const pupilOffsetRange = Math.max(0, globeRadius - pupilRadius * 1.15);
+      const pupilX = cx + currentExpression.pupilOffsetX * pupilOffsetRange;
+      const pupilY = cy + currentExpression.pupilOffsetY * pupilOffsetRange;
+      ctx.fillStyle = "#f4f0e8";
+      ctx.beginPath();
+      ctx.arc(cx, cy, globeRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = "#c8c1b9";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      if (currentName === "loving") {
+        drawHeart(cx, cy, width * 0.26);
+      } else if (open > 0.14) {
+        const blueRadius = pupilRadius;
+        ctx.fillStyle = "#165b8c";
+        ctx.beginPath();
+        ctx.arc(pupilX, pupilY, blueRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#2d63ff";
+        ctx.beginPath();
+        ctx.arc(pupilX, pupilY, blueRadius * 0.72, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#0f0d0c";
+        ctx.beginPath();
+        ctx.arc(pupilX, pupilY, blueRadius * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "rgba(255,255,255,0.9)";
+        ctx.beginPath();
+        ctx.arc(pupilX - blueRadius * 0.28, pupilY - blueRadius * 0.28, blueRadius * 0.16, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.strokeStyle = "#f4f0e8";
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(cx - width * 0.4, cy);
+        ctx.lineTo(cx + width * 0.4, cy);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    function drawBrow(side) {
+      const sign = side === "left" ? -1 : 1;
+      const region = side === "left" ? firmware.leftEyeRegion : firmware.rightEyeRegion;
+      const socket = firmware.eyeSocket;
+      const cx = scaleX(region.x + socket.ox + socket.w / 2);
+      const browBaseY = region.y + 5;
+      const cy = scaleY(browBaseY - currentExpression.browLift * firmware.screenH);
+      const width = scaleW(socket.w - 4);
+      const half = width * 0.5;
+      const tilt = currentExpression.browTilt * 30 * sign;
+      const curve = currentExpression.browCurve * 40;
+
+      const x0 = cx - half;
+      const x1 = cx + half;
+      const y0 = cy + tilt;
+      const y1 = cy - tilt;
+
+      ctx.save();
+      ctx.strokeStyle = "#f0c449";
+      ctx.lineCap = "round";
+      ctx.lineWidth = baseFace.browThickness;
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      ctx.quadraticCurveTo(cx, cy - curve, x1, y1);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawCheeks() {
+      const amount = currentExpression.mouthLift;
+      if (Math.abs(amount) < 0.05) return;
+
+      ctx.save();
+      ctx.fillStyle = amount > 0 ? "rgba(217, 93, 57, 0.18)" : "rgba(70, 112, 150, 0.12)";
+      const y = scaleY(firmware.mouthRegion.y + 20) - amount * 26;
+      const rx = 54;
+      const ry = 26 + Math.abs(amount) * 12;
+      ctx.beginPath();
+      ctx.ellipse(scaleX(78), y, rx, ry, -0.2, 0, Math.PI * 2);
+      ctx.ellipse(scaleX(162), y, rx, ry, 0.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawMouth() {
+      const expression = resolveMouthExpression(currentExpression);
+      const frownAmount = Math.max(0, expression.mouthDownturn);
+      const smileAmount = Math.max(0, -expression.mouthDownturn);
+      const morphValue = clamp(currentExpression.angryMouth ?? 0, 0, angryMouthMorphMax);
+      const angryWaveMorph = clamp((morphValue - angryMouthMorphStart) / (angryMouthMorphMax - angryMouthMorphStart), 0, 1);
+      const mouth = firmware.mouthRegion;
+      const cx = scaleX(mouth.x + mouth.w / 2 + mouthOffsetX);
+      const cy = scaleY(mouth.y + mouth.h / 2);
+      const highOpenRoundness = clamp(
+        (expression.mouthOpen - mouthOpenLegacyMax) / (mouthOpenMax - mouthOpenLegacyMax),
+        0,
+        1
+      );
+      const width = scaleW(52) * (expression.mouthWidthScale + smileAmount * 0.13) * (1 - highOpenRoundness * 0.34);
+      const half = width * 0.5;
+      const open = shapeMouthOpen(expression.mouthOpen) * 82 + highOpenRoundness * 48 + smileAmount * 18;
+      const curveStrength = 1 - highOpenRoundness * 0.85;
+      const curveResponse = Math.sign(expression.mouthCurve) * Math.pow(Math.abs(expression.mouthCurve), 0.9);
+      const curve = curveResponse * 142 * curveStrength;
+      const curveCornerLift = curve * 0.1;
+      const topLift = Math.min(0, curve) * 0.08;
+
+      const x0 = cx - half;
+      const x1 = cx + half;
+
+      ctx.save();
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = "#f4f0e8";
+      ctx.fillStyle = "rgba(255,255,255,0.05)";
+
+      if (highOpenRoundness > highOpenOvalStart && angryWaveMorph === 0) {
+        const capsuleBlend = smoothstep(highOpenOvalStart, 1, highOpenRoundness);
+        const capsuleRx = half * (1 - capsuleBlend * 0.02) * highOpenCapsuleWidthRatio;
+        const capsuleRy = lerp(capsuleRx, capsuleRx * highOpenCapsuleHeightRatio, capsuleBlend);
+        const capsuleHeight = capsuleRy * 2;
+
+        ctx.beginPath();
+        ctx.ellipse(cx, cy + capsuleBlend * 10, capsuleRx, capsuleRy, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "#f4f0e8";
+        ctx.fill();
+
+        ctx.save();
+        ctx.clip();
+        ctx.fillStyle = "#150e13";
+        ctx.fillRect(cx - capsuleRx - 4, cy + capsuleBlend * 10 - capsuleHeight / 2 - 4, capsuleRx * 2 + 8, capsuleHeight + 8);
+        ctx.restore();
+        ctx.stroke();
+        ctx.restore();
+        return;
+      }
+
+      if (angryWaveMorph > 0) {
+        const flattenBlend = clamp(
+          (morphValue - angryMouthMorphStart) / (angryMouthLinePoint - angryMouthMorphStart),
+          0,
+          1
+        );
+        const waveBlend = clamp(
+          (morphValue - angryMouthLinePoint) / (angryMouthMorphMax - angryMouthLinePoint),
+          0,
+          1
+        );
+        const baselineY = cy - expression.mouthLift * 26 - 2;
+
+        ctx.beginPath();
+        for (let i = 0; i <= 96; i++) {
+          const t = i / 96;
+          const x = x0 + (x1 - x0) * t;
+          const xNorm = t * 2 - 1;
+          const tiltOffset = -xNorm * 28 * angryWaveMorph;
+          const waveOffset = Math.sin(t * Math.PI * 2) * 72 * waveBlend;
+          const targetY = baselineY + tiltOffset + waveOffset;
+          const angryY = cy + curve * (1 - Math.pow(xNorm, 2));
+          const y = lerp(angryY, targetY, flattenBlend);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.restore();
+        return;
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(x0, cy - curveCornerLift);
+      ctx.bezierCurveTo(
+        cx - half * 0.32,
+        cy + curve * 0.82,
+        cx + half * 0.32,
+        cy + curve * 0.82,
+        x1,
+        cy - curveCornerLift
+      );
+
+      if (open > 2) {
+        ctx.bezierCurveTo(
+          cx + half * 0.28,
+          cy + curve * 0.58 + open,
+          cx - half * 0.28,
+          cy + curve * 0.58 + open,
+          x0,
+          cy + topLift
+        );
+        ctx.closePath();
+        ctx.fillStyle = "#f4f0e8";
+        ctx.fill();
+
+        ctx.save();
+        ctx.clip();
+        ctx.fillStyle = "#150e13";
+        ctx.fillRect(cx - half, cy - 10, width, open + 40);
+        if (currentName !== "angry" && currentName !== "sleepy") {
+          ctx.fillStyle = "#ca6677";
+          ctx.beginPath();
+          ctx.ellipse(cx, cy + open * 0.78, width * 0.24, open * 0.3, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawHeart(cx, cy, size) {
+      ctx.save();
+      ctx.translate(cx, cy + size * 0.1);
+      ctx.scale(size, size);
+      ctx.fillStyle = "#d64045";
+      ctx.beginPath();
+      ctx.moveTo(0, 0.52);
+      ctx.bezierCurveTo(-0.9, -0.05, -0.9, -1.1, 0, -0.62);
+      ctx.bezierCurveTo(0.9, -1.1, 0.9, -0.05, 0, 0.52);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function roundedRect(context, x, y, width, height, radius, fill, stroke) {
+      const r = Math.min(radius, width / 2, height / 2);
+      context.beginPath();
+      context.moveTo(x + r, y);
+      context.arcTo(x + width, y, x + width, y + height, r);
+      context.arcTo(x + width, y + height, x, y + height, r);
+      context.arcTo(x, y + height, x, y, r);
+      context.arcTo(x, y, x + width, y, r);
+      context.closePath();
+      if (fill) context.fill();
+      if (stroke) context.stroke();
+    }
+
+    function render() {
+      if (previewAnimation) {
+        const elapsed = performance.now() - previewAnimation.startTime;
+        const phaseDuration = previewAnimation.phaseDurationMs;
+        const totalPhases = previewAnimation.repeats * 2;
+        const phaseProgress = elapsed / phaseDuration;
+        if (phaseProgress >= totalPhases) {
+          currentExpression = clonePreset(previewAnimation.startExpression);
+          currentName = loopFromName;
+          previewAnimation = null;
+          setPreviewButtons(false);
+        } else {
+          const phaseIndex = Math.floor(phaseProgress);
+          const phaseT = easeInOutCubic(phaseProgress - phaseIndex);
+          const goingToTarget = phaseIndex % 2 === 0;
+          const fromExpression = goingToTarget
+            ? previewAnimation.startExpression
+            : previewAnimation.endExpression;
+          const toExpression = goingToTarget
+            ? previewAnimation.endExpression
+            : previewAnimation.startExpression;
+          currentExpression = mixExpressions(fromExpression, toExpression, phaseT);
+          currentName = loopFromName;
+        }
+      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawGrid();
+      drawMainBaseFace();
+      drawHair();
+      drawConstructionOverlay();
+      syncSliders();
+    }
+
+    function frame() {
+      render();
+      requestAnimationFrame(frame);
+    }
+
+    function populateExpressions() {
+      Object.keys(presets).forEach((name) => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        expressionSelect.append(option);
+      });
+      const fromCustomOption = document.createElement("option");
+      fromCustomOption.value = customLoopValue;
+      fromCustomOption.textContent = "Custom";
+      expressionSelect.append(fromCustomOption);
+      Object.keys(presets).forEach((name) => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        previewLoopTarget.append(option);
+      });
+      const toCustomOption = document.createElement("option");
+      toCustomOption.value = customLoopValue;
+      toCustomOption.textContent = "Custom";
+      previewLoopTarget.append(toCustomOption);
+      updateLoopSelectValues();
+      expressionSelect.addEventListener("change", () => {
+        cancelPreviewAnimation();
+        if (expressionSelect.value === customLoopValue) {
+          loopFromUsesCustom = true;
+          currentExpression = resolveLoopFromExpression();
+          currentName = loopFromName;
+        } else {
+          loopFromName = expressionSelect.value;
+          loopFromUsesCustom = false;
+          currentName = loopFromName;
+          currentExpression = getExpressionByName(currentName);
+        }
+        hasSliderChanges = false;
+        syncLoopCaptureButtons();
+        render();
+      });
+      previewLoopTarget.addEventListener("change", () => {
+        cancelPreviewAnimation();
+        if (previewLoopTarget.value === customLoopValue) {
+          loopToUsesCustom = true;
+        } else {
+          loopToName = previewLoopTarget.value;
+          loopToUsesCustom = false;
+        }
+        hasSliderChanges = false;
+        syncLoopCaptureButtons();
+        render();
+      });
+      syncLoopCaptureButtons();
+    }
+
+    copyButton.addEventListener("click", async () => {
+      jsonOutput.select();
+      try {
+        await navigator.clipboard.writeText(jsonOutput.value);
+        copyButton.textContent = "Copied";
+      } catch (error) {
+        copyButton.textContent = "Select JSON";
+      }
+      window.setTimeout(() => {
+        copyButton.textContent = "Copy JSON";
+      }, 1200);
+    });
+
+    previewLoopButton.addEventListener("click", () => {
+      const repeats = clamp(Number(previewRepeats.value) || 1, 1, 20);
+      previewRepeats.value = String(repeats);
+      runPreviewLoop(
+        resolveLoopFromExpression(),
+        resolveLoopToExpression(),
+        repeats
+      );
+      render();
+    });
+
+    stopPreviewButton.addEventListener("click", () => {
+      cancelPreviewAnimation();
+      render();
+    });
+
+    setLoopFromButton.addEventListener("click", () => {
+      cancelPreviewAnimation();
+      if (!hasSliderChanges) {
+        updateLoopSelectValues();
+        flashButtonLabel(setLoopFromButton, "Preset");
+        render();
+        return;
+      }
+      loopFromCustomExpression = normalizeDynamicExpressionConstraints(clonePreset(currentExpression));
+      loopFromUsesCustom = true;
+      hasSliderChanges = false;
+      expressionSelect.value = customLoopValue;
+      currentName = loopFromName;
+      syncLoopCaptureButtons();
+      flashButtonLabel(setLoopFromButton, "Saved");
+      render();
+    });
+
+    setLoopToButton.addEventListener("click", () => {
+      cancelPreviewAnimation();
+      if (!hasSliderChanges) {
+        updateLoopSelectValues();
+        flashButtonLabel(setLoopToButton, "Preset");
+        render();
+        return;
+      }
+      loopToCustomExpression = normalizeDynamicExpressionConstraints(clonePreset(currentExpression));
+      loopToUsesCustom = true;
+      hasSliderChanges = false;
+      previewLoopTarget.value = customLoopValue;
+      syncLoopCaptureButtons();
+      flashButtonLabel(setLoopToButton, "Saved");
+      render();
+    });
+
+    applyDeviceLayout();
+    applyPanelVisibility();
+    window.addEventListener("resize", applyDeviceLayout);
+
+    createSliders();
+    populateExpressions();
+    setPreviewButtons(false);
+    frame();
+  </script>
+  <!-- Copyright 2025 Paul Hodara All Rights Reserved -->
+</body>
+</html>
