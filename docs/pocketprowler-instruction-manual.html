@@ -166,7 +166,23 @@
       background: var(--ink);
     }
 
+    .strip a {
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .strip a:hover span,
+    .strip a:focus span {
+      background: var(--cyan);
+    }
+
+    .strip a:focus {
+      outline: 3px solid var(--cyan);
+      outline-offset: -3px;
+    }
+
     .strip span {
+      display: block;
       padding: 9px 7px;
       background: var(--yellow);
       text-align: center;
@@ -510,16 +526,16 @@
     </header>
 
     <div class="strip" aria-label="Manual contents">
-      <span>Device</span>
-      <span>Flash</span>
-      <span>WiFi</span>
-      <span>BLE</span>
-      <span>Buttons</span>
-      <span>Battery</span>
-      <span>Serial</span>
+      <a href="#device"><span>Device</span></a>
+      <a href="#flash"><span>Flash</span></a>
+      <a href="#wifi"><span>WiFi</span></a>
+      <a href="#ble"><span>BLE</span></a>
+      <a href="#buttons"><span>Buttons</span></a>
+      <a href="#battery"><span>Battery</span></a>
+      <a href="#serial"><span>Serial</span></a>
     </div>
 
-    <section class="section">
+    <section class="section" id="device">
       <div class="num">01</div>
       <div>
         <h2>What It Is</h2>
@@ -540,7 +556,7 @@
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="flash">
       <div class="num">02</div>
       <div>
         <h2>Install Firmware</h2>
@@ -568,7 +584,7 @@ esptool.py --chip esp32c5 --port /dev/ttyACM0 write_flash 0x0 firmware.factory.b
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="buttons">
       <div class="num">03</div>
       <div>
         <h2>Button Map</h2>
@@ -588,7 +604,7 @@ esptool.py --chip esp32c5 --port /dev/ttyACM0 write_flash 0x0 firmware.factory.b
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="wifi">
       <div class="num">04</div>
       <div>
         <h2>WiFi Scan</h2>
@@ -615,7 +631,7 @@ esptool.py --chip esp32c5 --port /dev/ttyACM0 write_flash 0x0 firmware.factory.b
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="ble">
       <div class="num">05</div>
       <div>
         <h2>Bluetooth Scan</h2>
@@ -643,7 +659,7 @@ esptool.py --chip esp32c5 --port /dev/ttyACM0 write_flash 0x0 firmware.factory.b
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="signal">
       <div class="num">06</div>
       <div>
         <h2>Read Signal</h2>
@@ -661,7 +677,7 @@ esptool.py --chip esp32c5 --port /dev/ttyACM0 write_flash 0x0 firmware.factory.b
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="battery">
       <div class="num">07</div>
       <div>
         <h2>Battery</h2>
@@ -688,7 +704,7 @@ esptool.py --chip esp32c5 --port /dev/ttyACM0 write_flash 0x0 firmware.factory.b
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="case">
       <div class="num">08</div>
       <div>
         <h2>Case And Ports</h2>
@@ -718,7 +734,7 @@ esptool.py --chip esp32c5 --port /dev/ttyACM0 write_flash 0x0 firmware.factory.b
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="serial">
       <div class="num">09</div>
       <div>
         <h2>Troubleshooting</h2>
