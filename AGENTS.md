@@ -58,3 +58,6 @@ To verify a non-default expression without modifying the repo, create a temporar
 ## Longer Memory
 
 See `docs/PROJECT_MEMORY.md` for compact project history and design notes that should carry across future sessions.
+
+## Write cookie to exclude this browser from analytics
+https://www.vidiotbox.net/?
