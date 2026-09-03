@@ -1,0 +1,13 @@
+{
+  "name": "PocketProwler",
+  "version": "v2.2.0",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32-C5",
+      "parts": [
+        { "path": "firmware.factory.bin?v=2.2.0", "offset": 0 }
+      ]
+    }
+  ]
+}
