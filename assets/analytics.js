@@ -5,6 +5,11 @@
   var INTERNAL_KEY = "vidiotbox_ga_internal";
   var COOKIE_MAX_AGE = 60 * 60 * 24 * 365 * 10;
 
+  function cookieDomainAttribute() {
+    var host = window.location.hostname;
+    return /(^|\.)vidiotbox\.net$/i.test(host) ? "; domain=.vidiotbox.net" : "";
+  }
+
   function readCookie(name) {
     return document.cookie
       .split(";")
@@ -17,11 +22,12 @@
   }
 
   function writeCookie(name, value) {
-    document.cookie = name + "=" + encodeURIComponent(value) + "; max-age=" + COOKIE_MAX_AGE + "; path=/; SameSite=Lax";
+    document.cookie = name + "=" + encodeURIComponent(value) + "; max-age=" + COOKIE_MAX_AGE + "; path=/; SameSite=Lax" + cookieDomainAttribute();
   }
 
   function clearCookie(name) {
     document.cookie = name + "=; max-age=0; path=/; SameSite=Lax";
+    document.cookie = name + "=; max-age=0; path=/; SameSite=Lax" + cookieDomainAttribute();
   }
 
   function readStoredFlag(name) {
@@ -77,6 +83,11 @@
 
   var optedOut = readStoredFlag(OPT_OUT_KEY) === "1";
   window[DISABLE_KEY] = optedOut;
+  window.vidiotboxAnalytics = {
+    gaId: GA_ID,
+    internal: readStoredFlag(INTERNAL_KEY) === "1",
+    optedOut: optedOut
+  };
 
   if (optedOut) {
     return;
@@ -95,7 +106,7 @@
   window.gtag("js", new Date());
 
   var config = {};
-  if (readStoredFlag(INTERNAL_KEY) === "1") {
+  if (window.vidiotboxAnalytics.internal) {
     config.traffic_type = "internal";
   }
   window.gtag("config", GA_ID, config);
