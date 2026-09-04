@@ -8,6 +8,7 @@ const path = require('path');
 const root = path.resolve(__dirname, '..');
 const chromePath = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const output = path.join(root, 'assets', 'social', 'vidiotbox-philosophy-instagram.mp4');
+const silentOutput = path.join(root, 'assets', 'social', 'vidiotbox-philosophy-instagram-WithoutAudio.mp4');
 const framesDir = path.join(os.tmpdir(), 'vidiotbox-philosophy-frames');
 const profileDir = path.join(os.tmpdir(), 'vidiotbox-philosophy-chrome-profile');
 const width = Number(process.env.WIDTH || 1080);
@@ -23,6 +24,10 @@ const finalTranslate = Number(process.env.FINAL_TRANSLATE || -1050);
 const startScale = Number(process.env.START_SCALE || 0.46);
 const finalScale = Number(process.env.FINAL_SCALE || 0.46);
 const crawlTop = process.env.CRAWL_TOP || '42vh';
+const audioInput = process.env.AUDIO
+  ? path.resolve(root, process.env.AUDIO)
+  : '';
+const audioVolume = Number(process.env.AUDIO_VOLUME || 1);
 
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -80,6 +85,10 @@ function createCdpClient(url) {
 }
 
 async function main() {
+  if (audioInput && !fs.existsSync(audioInput)) {
+    throw new Error(`Audio file not found: ${audioInput}`);
+  }
+
   fs.rmSync(framesDir, { recursive: true, force: true });
   fs.rmSync(profileDir, { recursive: true, force: true });
   fs.mkdirSync(framesDir, { recursive: true });
@@ -255,8 +264,26 @@ async function main() {
       '-preset', 'medium',
       '-crf', '18',
       '-movflags', '+faststart',
-      output,
+      audioInput ? silentOutput : output,
     ], { stdio: 'inherit' });
+
+    if (audioInput) {
+      execFileSync('ffmpeg', [
+        '-y',
+        '-i', silentOutput,
+        '-stream_loop', '-1',
+        '-i', audioInput,
+        '-t', String(seconds),
+        '-map', '0:v:0',
+        '-map', '1:a:0',
+        '-c:v', 'copy',
+        '-c:a', 'aac',
+        '-b:a', '192k',
+        '-af', `volume=${audioVolume}`,
+        '-movflags', '+faststart',
+        output,
+      ], { stdio: 'inherit' });
+    }
 
     const stats = fs.statSync(output);
     process.stdout.write(`wrote ${output} (${(stats.size / 1024 / 1024).toFixed(1)} MB)\n`);
