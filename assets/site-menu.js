@@ -1,7 +1,7 @@
 (function () {
   const menuCss = `
     .site-menu .menu-toggle {
-      width: 90px;
+      width: 116px;
       height: 44px;
       display: inline-flex;
       align-items: center;
@@ -25,6 +25,7 @@
       background: transparent !important;
       font: 800 13px/1 Arial, Helvetica, sans-serif;
       letter-spacing: 1px;
+      white-space: nowrap;
     }
 
     .site-menu .menu-toggle-puppet {
@@ -171,7 +172,7 @@
 
     const label = document.createElement('span');
     label.className = 'menu-toggle-label';
-    label.textContent = 'TOYS';
+    label.textContent = 'MY TOYS';
 
     return [puppet, label];
   }
