@@ -1,2 +1,4 @@
 .DS_Store
 /exports/
+/_site/
+__pycache__/

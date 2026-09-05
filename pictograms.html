@@ -39,17 +39,17 @@
   <script>
   (() => {
     const files = [
-      ['BabyDrivingCropped.png', 'Do not let babies drive'],
-      ['DoNotCarInholeCropped.png', 'Do not drive into a hole'],
-      ['DoNotClownOnUnicycleCropped.png', 'No clowns on unicycles'],
-      ['DoNotCowSaucerCropped.png', 'No cows in flying saucers'],
-      ['DoNotEjectionSeatCropped.png', 'Do not use the ejection seat'],
-      ['DoNotPickNoseCropped.png', 'Do not pick your nose'],
-      ['DogInMicrowaveCropped.png', 'Do not put dogs in microwaves'],
-      ['FootInMouth_Cropped.png', 'Do not put your foot in your mouth'],
-      ['NoHeadInToilet_Cropped.png', 'Do not put your head in the toilet'],
-      ['NoSleeping on tracksCropped.png', 'Do not sleep on the tracks'],
-      ['StepInShit_Cropped.png', 'Do not step in poop']
+      ['assets/pictograms/web/BabyDrivingCropped.png', 'Do not let babies drive'],
+      ['assets/pictograms/web/DoNotCarInholeCropped.png', 'Do not drive into a hole'],
+      ['assets/pictograms/web/DoNotClownOnUnicycleCropped.png', 'No clowns on unicycles'],
+      ['assets/pictograms/web/DoNotCowSaucerCropped.png', 'No cows in flying saucers'],
+      ['assets/pictograms/web/DoNotEjectionSeatCropped.png', 'Do not use the ejection seat'],
+      ['assets/pictograms/web/DoNotPickNoseCropped.png', 'Do not pick your nose'],
+      ['assets/pictograms/web/DogInMicrowaveCropped.png', 'Do not put dogs in microwaves'],
+      ['assets/pictograms/web/FootInMouth_Cropped.png', 'Do not put your foot in your mouth'],
+      ['assets/pictograms/web/NoHeadInToilet_Cropped.png', 'Do not put your head in the toilet'],
+      ['assets/pictograms/web/NoSleeping on tracksCropped.png', 'Do not sleep on the tracks'],
+      ['assets/pictograms/web/StepInShit_Cropped.png', 'Do not step in poop']
     ];
     const stage = document.querySelector('.stage');
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -58,7 +58,7 @@
     const discs = files.map(([file, label], i) => {
       const image = new Image();
       image.className = 'disc';
-      image.src = 'assets/pictograms/web/' + encodeURIComponent(file);
+      image.src = encodeURI(file);
       image.alt = label;
       image.draggable = false;
       stage.appendChild(image);
@@ -66,7 +66,7 @@
       const speed = 45 + Math.random() * 45;
       return { image, x: 0, y: 0, radius: 0, vx: Math.cos(direction) * speed,
         vy: Math.sin(direction) * speed, angle: (Math.random() - .5) * 24,
-        spin: (Math.random() - .5) * 14, scale: .82 + (i % 4) * .12 };
+        spin: (Math.random() - .5) * 14, scale: (.82 + (i % 4) * .12) * 1.2 };
     });
     // Pointer capture keeps the selected sign attached even outside its bounds.
     for (const d of discs) {
@@ -124,12 +124,11 @@
       for (const d of discs) {
         if (d.pointerId !== null) continue;
         d.x += d.vx * dt; d.y += d.vy * dt; d.angle += d.spin * dt;
-        // Walls sit beyond the viewport: signs disappear completely before returning.
-        const margin = d.radius * 2.3;
-        if (d.x < -margin) { d.x = -margin; d.vx = Math.abs(d.vx); }
-        if (d.x > width + margin) { d.x = width + margin; d.vx = -Math.abs(d.vx); }
-        if (d.y < -margin) { d.y = -margin; d.vy = Math.abs(d.vy); }
-        if (d.y > height + margin) { d.y = height + margin; d.vy = -Math.abs(d.vy); }
+        // Wrap fully hidden signs to the opposite edge, preserving their motion.
+        const margin = d.radius;
+        const wrapWidth = width + margin * 2, wrapHeight = height + margin * 2;
+        d.x = ((d.x + margin) % wrapWidth + wrapWidth) % wrapWidth - margin;
+        d.y = ((d.y + margin) % wrapHeight + wrapHeight) % wrapHeight - margin;
       }
       for (let i = 0; i < discs.length; i++) {
         for (let j = i + 1; j < discs.length; j++) {
