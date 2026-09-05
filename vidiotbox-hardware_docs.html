@@ -231,13 +231,22 @@
       gap: 3px;
     }
 
-    .strip span {
+    .strip a {
       background: var(--yellow);
+      color: var(--ink);
+      display: block;
       padding: 9px 7px;
       text-align: center;
       font-size: 11px;
       font-weight: 900;
+      text-decoration: none;
       text-transform: uppercase;
+    }
+
+    .strip a:hover,
+    .strip a:focus {
+      background: var(--cyan);
+      outline: none;
     }
 
     .section {
@@ -572,12 +581,12 @@
     </header>
 
     <div class="strip" aria-label="Quick feature strip">
-      <span>Touch Map</span>
-      <span>Moods</span>
-      <span>VU Bar</span>
-      <span>Battery</span>
-      <span>Setup Wi-Fi</span>
-      <span>Personality</span>
+      <a href="#touch-map">Touch Map</a>
+      <a href="#moods">Moods</a>
+      <a href="#vu-bar">VU Bar</a>
+      <a href="#battery">Battery</a>
+      <a href="#setup-wifi">Setup Wi-Fi</a>
+      <a href="#personality">Personality</a>
     </div>
 
     <section class="section">
@@ -626,7 +635,7 @@ vidiotbox-XXXX
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="touch-map">
       <div class="num">02</div>
       <div>
         <h2>Touch The Mood Map</h2>
@@ -745,7 +754,7 @@ vidiotbox-XXXX
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="moods">
       <div class="num">06</div>
       <div>
         <h2>Mood Parade</h2>
@@ -766,7 +775,7 @@ vidiotbox-XXXX
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="vu-bar">
       <div class="num">07</div>
       <div>
         <h2>Idle / Sound</h2>
@@ -806,7 +815,7 @@ vidiotbox-XXXX
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="setup-wifi">
       <div class="num">08</div>
       <div>
         <h2>Setup Portal</h2>
@@ -828,7 +837,7 @@ vidiotbox-XXXX
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="battery">
       <div class="num">09</div>
       <div>
         <h2>Battery / Rest</h2>
@@ -851,7 +860,7 @@ vidiotbox-XXXX
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="personality">
       <div class="num">10</div>
       <div>
         <h2>Personality</h2>
