@@ -386,6 +386,58 @@
       text-transform: uppercase;
     }
 
+    .gif-preview {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      background: rgba(8, 8, 8, 0.62);
+    }
+
+    .gif-preview[hidden] {
+      display: none;
+    }
+
+    .gif-preview-panel {
+      width: min(420px, 100%);
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      background: var(--panel);
+      border: 4px solid var(--ink);
+      box-shadow: 8px 8px 0 var(--ink);
+    }
+
+    .gif-preview-panel img {
+      width: 100%;
+      max-height: 58dvh;
+      object-fit: contain;
+      background: var(--paper);
+      border: 3px solid var(--ink);
+    }
+
+    .gif-preview-note {
+      margin: 0;
+      color: var(--ink);
+      font-size: 0.84rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    .gif-preview-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .gif-preview-actions button {
+      min-height: 40px;
+    }
+
     body.smartphone {
       overflow-y: auto;
       overflow-x: hidden;
@@ -594,6 +646,18 @@
     </aside>
   </main>
 
+  <div class="gif-preview" id="gifPreview" hidden>
+    <div class="gif-preview-panel" role="dialog" aria-modal="true" aria-label="Generated GIF preview">
+      <img id="gifPreviewImage" alt="Generated Faceimator GIF">
+      <p class="gif-preview-note">Open the GIF, then use the iPhone share button to save the image.</p>
+      <div class="gif-preview-actions">
+        <button id="openGifButton" type="button">Open GIF</button>
+        <button id="shareGifButton" type="button">Share GIF</button>
+        <button id="closeGifPreviewButton" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const canvas = document.getElementById("faceCanvas");
     const ctx = canvas.getContext("2d");
@@ -609,6 +673,11 @@
     const previewRepeats = document.getElementById("previewRepeats");
     const setLoopFromButton = document.getElementById("setLoopFromButton");
     const setLoopToButton = document.getElementById("setLoopToButton");
+    const gifPreview = document.getElementById("gifPreview");
+    const gifPreviewImage = document.getElementById("gifPreviewImage");
+    const openGifButton = document.getElementById("openGifButton");
+    const shareGifButton = document.getElementById("shareGifButton");
+    const closeGifPreviewButton = document.getElementById("closeGifPreviewButton");
     const showExportPanel = false;
 
     function applyDeviceLayout() {
@@ -2479,7 +2548,7 @@
       );
     }
 
-    let pendingAppleGifFile = null;
+    let pendingAppleGif = null;
 
     function isAppleTouchDevice() {
       return /iP(hone|ad|od)/i.test(navigator.userAgent)
@@ -2497,28 +2566,50 @@
       }
     }
 
-    async function shareGifFile(file) {
+    function clearPendingAppleGif() {
+      if (pendingAppleGif && pendingAppleGif.url) {
+        URL.revokeObjectURL(pendingAppleGif.url);
+      }
+      pendingAppleGif = null;
+      gifPreview.hidden = true;
+      gifPreviewImage.removeAttribute("src");
+      downloadGifButton.textContent = "Download GIF";
+    }
+
+    function openPendingAppleGif() {
+      if (!pendingAppleGif) return;
+
+      const openedWindow = window.open(pendingAppleGif.url, "_blank");
+      if (!openedWindow) {
+        window.location.href = pendingAppleGif.url;
+      }
+    }
+
+    async function sharePendingAppleGif() {
+      if (!pendingAppleGif || !pendingAppleGif.file) {
+        openPendingAppleGif();
+        return;
+      }
+
       downloadGifButton.disabled = true;
       try {
         await navigator.share({
-          files: [file],
+          files: [pendingAppleGif.file],
           title: "Faceimator GIF"
         });
-        pendingAppleGifFile = null;
+        clearPendingAppleGif();
         downloadGifButton.textContent = "Shared";
         window.setTimeout(() => {
           downloadGifButton.textContent = "Download GIF";
         }, 900);
       } catch (error) {
         if (error && error.name === "AbortError") {
-          downloadGifButton.textContent = "Share GIF";
+          downloadGifButton.textContent = "Open GIF";
           return;
         }
 
-        pendingAppleGifFile = null;
         if (error && error.name !== "AbortError") {
-          downloadBlob(file, file.name);
-          flashButtonLabel(downloadGifButton, "Downloaded");
+          openPendingAppleGif();
         }
       } finally {
         downloadGifButton.disabled = false;
@@ -2537,14 +2628,20 @@
     }
 
     function prepareAppleGifShare(blob, filename) {
-      if (!isAppleTouchDevice() || typeof File === "undefined") return false;
+      if (!isAppleTouchDevice()) return false;
 
-      const file = new File([blob], filename, { type: "image/gif" });
-      if (!canShareGifFile(file)) return false;
+      const url = URL.createObjectURL(blob);
+      let file = null;
+      if (typeof File !== "undefined") {
+        file = new File([blob], filename, { type: "image/gif" });
+      }
 
-      pendingAppleGifFile = file;
+      pendingAppleGif = { blob, file, filename, url };
+      gifPreviewImage.src = url;
+      shareGifButton.disabled = !file || !canShareGifFile(file);
+      gifPreview.hidden = false;
       downloadGifButton.disabled = false;
-      downloadGifButton.textContent = "Share GIF";
+      downloadGifButton.textContent = "Open GIF";
       return true;
     }
 
@@ -2616,7 +2713,7 @@
         currentExpression = originalExpression;
         currentName = originalName;
         previewAnimation = originalPreviewAnimation;
-        if (!pendingAppleGifFile) {
+        if (!pendingAppleGif) {
           downloadGifButton.disabled = false;
           downloadGifButton.textContent = "Download GIF";
         }
@@ -2736,11 +2833,23 @@
     });
 
     downloadGifButton.addEventListener("click", () => {
-      if (pendingAppleGifFile) {
-        shareGifFile(pendingAppleGifFile);
+      if (pendingAppleGif) {
+        openPendingAppleGif();
         return;
       }
       downloadLoopGif();
+    });
+
+    openGifButton.addEventListener("click", () => {
+      openPendingAppleGif();
+    });
+
+    shareGifButton.addEventListener("click", () => {
+      sharePendingAppleGif();
+    });
+
+    closeGifPreviewButton.addEventListener("click", () => {
+      clearPendingAppleGif();
     });
 
     stopPreviewButton.addEventListener("click", () => {
