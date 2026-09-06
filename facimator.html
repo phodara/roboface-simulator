@@ -2541,8 +2541,14 @@
       return true;
     }
 
+    function loopFilenamePart(name, usesCustom) {
+      return usesCustom ? "custom" : name;
+    }
+
     function promptForGifFilename() {
-      const defaultName = `faceimator-${loopFromName}-loop.gif`;
+      const fromName = loopFilenamePart(loopFromName, loopFromUsesCustom);
+      const toName = loopFilenamePart(loopToName, loopToUsesCustom);
+      const defaultName = `facimator - ${fromName} - ${toName}.gif`;
       const enteredName = window.prompt("Save GIF as", defaultName);
       if (enteredName === null) return null;
 
