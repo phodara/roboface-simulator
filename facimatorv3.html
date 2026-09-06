@@ -43,6 +43,7 @@
       line-height: 1.35;
       min-height: 100%;
       overflow-y: auto;
+      overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
     }
 
@@ -57,19 +58,20 @@
         linear-gradient(rgba(0,0,0,0.035) 1px, transparent 1px) 0 0 / 40px 40px,
         var(--paper);
       font-family: var(--ui-font);
-      overflow: auto;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
 
     .shell {
       display: grid;
-      grid-template-columns: minmax(470px, 79vw) minmax(270px, 19vw);
+      grid-template-columns: minmax(0, 1fr) 300px;
       gap: 16px;
       padding: 12px;
-      width: calc(100% / 0.8);
-      min-height: calc(100vh / 0.8);
+      width: 100%;
+      max-width: 1120px;
+      min-height: 100vh;
+      margin: 0 auto;
       align-items: start;
-      transform: scale(0.8);
-      transform-origin: top left;
     }
 
     .controls {
@@ -85,7 +87,7 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      align-items: flex-start;
+      align-items: center;
       padding: 0;
       background: transparent;
       border: 0;
@@ -212,13 +214,13 @@
     #faceCanvas {
       max-height: 168vh;
       margin-left: auto;
-      margin-right: 0;
+      margin-right: auto;
     }
 
     .stage-footer {
       width: 100%;
       max-width: 720px;
-      margin: 14px 0 0 auto;
+      margin: 14px auto 0;
       padding: 10px 12px;
       background: var(--yellow);
       border: 3px solid var(--ink);
@@ -245,6 +247,50 @@
 
     .control-group {
       display: grid;
+      gap: 6px;
+    }
+
+    .control-card {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      background: var(--paper);
+      border: 3px solid var(--ink);
+    }
+
+    .control-card-title {
+      margin: 0;
+      color: var(--ink);
+      font-size: 0.76rem;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+
+    .status-line {
+      min-height: 1.25em;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      line-height: 1.25;
+      text-transform: uppercase;
+    }
+
+    .helper-line {
+      margin: -2px 0 0;
+      color: var(--muted);
+      font-size: 0.64rem;
+      font-weight: 900;
+      letter-spacing: 0.03em;
+      line-height: 1.25;
+      text-transform: uppercase;
+    }
+
+    .loop-row {
+      display: grid;
+      grid-template-columns: 1fr;
       gap: 6px;
     }
 
@@ -280,6 +326,14 @@
       min-width: 52px;
       padding: 8px 0;
       letter-spacing: 0;
+      text-align: center;
+    }
+
+    .capture-button {
+      min-height: 38px;
+      padding: 8px;
+      font-size: 0.72rem;
+      letter-spacing: 0.03em;
       text-align: center;
     }
 
@@ -386,6 +440,91 @@
       text-transform: uppercase;
     }
 
+    #moodPadPanel {
+      display: none;
+    }
+
+    .mood-chips {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .mood-chips button {
+      padding: 10px 4px;
+      font-size: 0.66rem;
+      min-height: 44px;
+    }
+
+    .mood-pad-wrap {
+      display: flex;
+      justify-content: center;
+      padding: 6px 0 2px;
+    }
+
+    .mood-pad {
+      position: relative;
+      width: min(62vw, 260px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 4px solid var(--ink);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      touch-action: none;
+    }
+
+    .mood-pad::before,
+    .mood-pad::after {
+      content: "";
+      position: absolute;
+      background: rgba(8, 8, 8, 0.18);
+    }
+
+    .mood-pad::before {
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 2px;
+      transform: translateY(-1px);
+    }
+
+    .mood-pad::after {
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      transform: translateX(-1px);
+    }
+
+    .mood-pad-label {
+      position: absolute;
+      padding: 3px 7px;
+      border: 2px solid var(--ink);
+      font-size: 0.62rem;
+      font-weight: 950;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .mood-pad-label--happy { top: 8px; right: 8px; background: var(--yellow); }
+    .mood-pad-label--angry { top: 8px; left: 8px; background: var(--red); color: #fff; }
+    .mood-pad-label--sad { bottom: 8px; left: 8px; background: var(--blue); color: #fff; }
+    .mood-pad-label--loving { bottom: 8px; right: 8px; background: var(--pink); }
+
+    .mood-pad-handle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 24px;
+      height: 24px;
+      margin: -12px 0 0 -12px;
+      border-radius: 50%;
+      background: var(--cyan);
+      border: 3px solid var(--ink);
+      pointer-events: none;
+    }
+
     body.smartphone {
       overflow-y: auto;
       overflow-x: hidden;
@@ -395,8 +534,8 @@
     body.smartphone .shell {
       display: flex;
       flex-direction: column;
-      gap: 2px;
-      padding: 0 4px 4px;
+      gap: 8px;
+      padding: 0 12px 4px;
       width: 100%;
       height: auto;
       transform: none;
@@ -409,44 +548,16 @@
       align-self: stretch;
       min-width: 0;
       min-height: 0;
-      padding: 0 3px 3px;
-      gap: 3px;
+      padding: 0 8px;
+      gap: 10px;
       align-content: start;
       overflow-x: hidden;
       overflow-y: visible;
-      padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
-    }
-
-    body.smartphone .controls > .control-group {
-      gap: 1px;
-    }
-
-    body.smartphone .controls > .control-group h2 {
-      font-size: 0.58rem;
-    }
-
-    body.smartphone .row {
-      gap: 1px;
-    }
-
-    body.smartphone label,
-    body.smartphone .value,
-    body.smartphone .hint,
-    body.smartphone select,
-    body.smartphone button,
-    body.smartphone textarea {
-      font-size: 0.52rem;
-    }
-
-    body.smartphone select,
-    body.smartphone button,
-    body.smartphone textarea {
-      padding: 2px 4px;
-      border-radius: var(--radius);
+      padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     }
 
     body.smartphone .button-row {
-      gap: 2px;
+      gap: 8px;
     }
 
     body.smartphone .stage {
@@ -472,48 +583,22 @@
       line-height: 1.2;
     }
 
-    body.smartphone #sliderPanel {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      column-gap: 5px;
-      row-gap: 2px;
-    }
-
-    body.smartphone #sliderPanel h2 {
-      grid-column: 1 / -1;
-    }
-
-    body.smartphone #sliderPanel .control-group {
-      gap: 1px;
-    }
-
-    body.smartphone .value {
-      min-width: 2ch;
-    }
-
-    body.smartphone #sliderPanel input[type="range"] {
-      height: 6px;
-    }
-
-    body.smartphone textarea {
-      min-height: 32px;
-      max-height: 5svh;
-    }
-
     body.smartphone .controls > .control-group:last-child {
       display: none;
     }
 
-    body.smartphone .controls > .control-group:first-child h2 {
+    body.smartphone #sliderPanel {
       display: none;
     }
 
-    body.smartphone #sliderPanel h2 {
-      display: none;
+    body.smartphone #moodPadPanel {
+      display: grid;
     }
 
     @media (max-width: 960px) {
       body {
-        overflow: auto;
+        overflow-x: hidden;
+        overflow-y: auto;
       }
 
       body:not(.smartphone) .shell {
@@ -556,30 +641,65 @@
 
     <aside class="controls">
       <section class="control-group">
-        <h2>Faceimator Animator</h2>
-        <div class="row row-with-action">
-          <label for="expressionSelect">Loop From</label>
-          <button id="setLoopFromButton" type="button">Set</button>
-          <select id="expressionSelect"></select>
+        <h2>Faceimator V2</h2>
+        <div class="control-card">
+          <p class="control-card-title">Loop From</p>
+          <div class="loop-row">
+            <label for="expressionSelect">Preset or Capture</label>
+            <select id="expressionSelect"></select>
+          </div>
+          <p class="helper-line">For custom, adjust Geometry sliders and select Custom Capture dropdown.</p>
+          <div class="status-line" id="loopFromStatus">Using preset: Neutral</div>
         </div>
-        <div class="row row-with-action">
-          <label for="previewLoopTarget">Loop To</label>
-          <button id="setLoopToButton" type="button">Set</button>
-          <select id="previewLoopTarget"></select>
-        </div>
-        <div class="button-row">
-          <button id="copyButton" type="button">Copy JSON</button>
+        <div class="control-card">
+          <p class="control-card-title">Loop To</p>
+          <div class="loop-row">
+            <label for="previewLoopTarget">Preset or Capture</label>
+            <select id="previewLoopTarget"></select>
+          </div>
+          <p class="helper-line">For custom, adjust Geometry sliders and select Custom Capture dropdown.</p>
+          <div class="status-line" id="loopToStatus">Using preset: Neutral</div>
         </div>
         <div class="row">
           <label for="previewRepeats">Repeats</label>
           <input id="previewRepeats" type="number" min="1" max="20" step="1" value="3">
         </div>
         <div class="button-row">
-          <button id="previewLoopButton" type="button">Loop Play</button>
+          <button id="previewLoopButton" type="button">Preview Loop</button>
           <button id="stopPreviewButton" type="button">Stop</button>
         </div>
         <div class="button-row">
-          <button id="downloadGifButton" type="button">Download GIF</button>
+          <button id="downloadGifButton" type="button">Export GIF</button>
+        </div>
+        <div class="button-row">
+          <button id="copyButton" type="button">Copy JSON</button>
+        </div>
+      </section>
+
+      <section class="control-group" id="moodPadPanel">
+        <h2>Quick Pose</h2>
+        <div class="control-card">
+          <p class="control-card-title">Mood Chips</p>
+          <div class="mood-chips" id="moodChips">
+            <button type="button" data-preset="neutral">Neutral</button>
+            <button type="button" data-preset="happy">Happy</button>
+            <button type="button" data-preset="angry">Angry</button>
+            <button type="button" data-preset="surprised">Surprised</button>
+            <button type="button" data-preset="sad">Sad</button>
+            <button type="button" data-preset="sleepy">Sleepy</button>
+            <button type="button" data-preset="loving">Loving</button>
+          </div>
+          <p class="helper-line">Tap a mood, or drag inside the circle to blend between moods.</p>
+          <div class="mood-pad-wrap">
+            <div class="mood-pad" id="moodPad">
+              <div class="mood-pad-label mood-pad-label--happy">Happy</div>
+              <div class="mood-pad-label mood-pad-label--angry">Angry</div>
+              <div class="mood-pad-label mood-pad-label--sad">Sad</div>
+              <div class="mood-pad-label mood-pad-label--loving">Loving</div>
+              <div class="mood-pad-handle" id="moodPadHandle"></div>
+            </div>
+          </div>
+          <p class="helper-line">Use Loop From / Loop To above and choose "Custom capture current face" to save this pose into a loop.</p>
         </div>
       </section>
 
@@ -607,8 +727,11 @@
     const downloadGifButton = document.getElementById("downloadGifButton");
     const previewLoopTarget = document.getElementById("previewLoopTarget");
     const previewRepeats = document.getElementById("previewRepeats");
-    const setLoopFromButton = document.getElementById("setLoopFromButton");
-    const setLoopToButton = document.getElementById("setLoopToButton");
+    const loopFromStatus = document.getElementById("loopFromStatus");
+    const loopToStatus = document.getElementById("loopToStatus");
+    const moodChips = document.getElementById("moodChips");
+    const moodPad = document.getElementById("moodPad");
+    const moodPadHandle = document.getElementById("moodPadHandle");
     const showExportPanel = false;
 
     function applyDeviceLayout() {
@@ -880,6 +1003,7 @@
     const highOpenOvalSubdivisionPasses = 1;
 
     const customLoopValue = "__custom__";
+    const customLoopSetValue = "__custom_set__";
 
     let currentName = "neutral";
     let currentExpression = { ...expressionDefaults, ...clonePreset(presets[currentName]) };
@@ -917,16 +1041,12 @@
     }
 
     function setPreviewButtons(isPlaying) {
-      previewLoopButton.textContent = isPlaying ? "Looping..." : "Loop Play";
+      previewLoopButton.textContent = isPlaying ? "Previewing..." : "Preview Loop";
       stopPreviewButton.disabled = !isPlaying;
       expressionSelect.disabled = isPlaying;
       previewLoopTarget.disabled = isPlaying;
-      if (isPlaying) {
-        setLoopFromButton.disabled = true;
-        setLoopToButton.disabled = true;
-      } else {
-        syncLoopCaptureButtons();
-      }
+      if (!isPlaying) syncLoopCaptureButtons();
+      updateControlStatus();
     }
 
     function getExpressionByName(name) {
@@ -963,9 +1083,78 @@
         : getExpressionByName(loopToName);
     }
 
+    function setMoodPadHandlePosition(nx, ny) {
+      moodPadHandle.style.left = `${((nx + 1) / 2) * 100}%`;
+      moodPadHandle.style.top = `${((1 - ny) / 2) * 100}%`;
+    }
+
+    const moodCorners = {
+      neutral: [0, 0],
+      happy: [1, 1],
+      angry: [-1, 1],
+      sad: [-1, -1],
+      loving: [1, -1]
+    };
+
+    function blendMoodPad(nx, ny) {
+      const r = clamp(Math.sqrt(nx * nx + ny * ny), 0, 1);
+      const tx = clamp((nx + 1) / 2, 0, 1);
+      const ty = clamp((ny + 1) / 2, 0, 1);
+      const neutralExp = getExpressionByName("neutral");
+      const happyExp = getExpressionByName("happy");
+      const angryExp = getExpressionByName("angry");
+      const sadExp = getExpressionByName("sad");
+      const lovingExp = getExpressionByName("loving");
+      const blended = {};
+      sliderDefs.forEach(([key]) => {
+        const top = lerp(angryExp[key], happyExp[key], tx);
+        const bottom = lerp(sadExp[key], lovingExp[key], tx);
+        const directional = lerp(bottom, top, ty);
+        blended[key] = lerp(neutralExp[key], directional, r);
+      });
+      return normalizeDynamicExpressionConstraints(blended);
+    }
+
+    function applyMoodPadPosition(nx, ny) {
+      setMoodPadHandlePosition(nx, ny);
+      cancelPreviewAnimation();
+      currentName = "custom";
+      currentExpression = blendMoodPad(nx, ny);
+      hasSliderChanges = true;
+      syncSliders();
+      render();
+    }
+
+    function applyMoodChip(name) {
+      cancelPreviewAnimation();
+      currentName = name;
+      currentExpression = getExpressionByName(name);
+      hasSliderChanges = false;
+      if (moodCorners[name]) {
+        setMoodPadHandlePosition(moodCorners[name][0], moodCorners[name][1]);
+      }
+      syncLoopCaptureButtons();
+      syncSliders();
+      render();
+    }
+
     function updateLoopSelectValues() {
-      expressionSelect.value = loopFromUsesCustom ? customLoopValue : loopFromName;
-      previewLoopTarget.value = loopToUsesCustom ? customLoopValue : loopToName;
+      expressionSelect.value = loopFromUsesCustom ? customLoopSetValue : loopFromName;
+      previewLoopTarget.value = loopToUsesCustom ? customLoopSetValue : loopToName;
+    }
+
+    function displayExpressionName(name) {
+      return name.charAt(0).toUpperCase() + name.slice(1);
+    }
+
+    function updateControlStatus() {
+      const editNote = hasSliderChanges ? " - current edits not captured" : "";
+      loopFromStatus.textContent = loopFromUsesCustom
+        ? `Custom capture is set from ${displayExpressionName(loopFromName)}${editNote}`
+        : `Using preset: ${displayExpressionName(loopFromName)}`;
+      loopToStatus.textContent = loopToUsesCustom
+        ? `Custom capture is set from ${displayExpressionName(loopToName)}${editNote}`
+        : `Using preset: ${displayExpressionName(loopToName)}`;
     }
 
     function flashButtonLabel(button, label) {
@@ -978,8 +1167,25 @@
 
     function syncLoopCaptureButtons() {
       if (previewAnimation) return;
-      setLoopFromButton.disabled = false;
-      setLoopToButton.disabled = false;
+      updateControlStatus();
+    }
+
+    function captureCurrentFaceForLoop(endpoint) {
+      const capturedExpression = normalizeDynamicExpressionConstraints(clonePreset(currentExpression));
+
+      if (endpoint === "from") {
+        loopFromName = currentName;
+        loopFromCustomExpression = capturedExpression;
+        loopFromUsesCustom = true;
+      } else {
+        loopToName = currentName;
+        loopToCustomExpression = capturedExpression;
+        loopToUsesCustom = true;
+      }
+
+      hasSliderChanges = false;
+      updateLoopSelectValues();
+      syncLoopCaptureButtons();
     }
 
     function runPreviewLoop(startExpression, endExpression, repeats) {
@@ -1169,6 +1375,7 @@
         objects: baseFaceObjects,
         expression: currentExpression
       }, null, 2);
+      updateControlStatus();
     }
 
     function drawBezierObject(targetCtx, object, transform) {
@@ -2557,7 +2764,7 @@
         currentName = originalName;
         previewAnimation = originalPreviewAnimation;
         downloadGifButton.disabled = false;
-        downloadGifButton.textContent = "Download GIF";
+        downloadGifButton.textContent = "Export GIF";
         render();
       }
     }
@@ -2597,6 +2804,11 @@
     }
 
     function populateExpressions() {
+      const fromSetOption = document.createElement("option");
+      fromSetOption.value = customLoopSetValue;
+      fromSetOption.textContent = "Is Set";
+      fromSetOption.hidden = true;
+      expressionSelect.append(fromSetOption);
       Object.keys(presets).forEach((name) => {
         const option = document.createElement("option");
         option.value = name;
@@ -2605,8 +2817,13 @@
       });
       const fromCustomOption = document.createElement("option");
       fromCustomOption.value = customLoopValue;
-      fromCustomOption.textContent = "Custom";
+      fromCustomOption.textContent = "Custom capture current face";
       expressionSelect.append(fromCustomOption);
+      const toSetOption = document.createElement("option");
+      toSetOption.value = customLoopSetValue;
+      toSetOption.textContent = "Is Set";
+      toSetOption.hidden = true;
+      previewLoopTarget.append(toSetOption);
       Object.keys(presets).forEach((name) => {
         const option = document.createElement("option");
         option.value = name;
@@ -2615,35 +2832,41 @@
       });
       const toCustomOption = document.createElement("option");
       toCustomOption.value = customLoopValue;
-      toCustomOption.textContent = "Custom";
+      toCustomOption.textContent = "Custom capture current face";
       previewLoopTarget.append(toCustomOption);
       updateLoopSelectValues();
       expressionSelect.addEventListener("change", () => {
         cancelPreviewAnimation();
         if (expressionSelect.value === customLoopValue) {
-          loopFromUsesCustom = true;
-          currentExpression = resolveLoopFromExpression();
-          currentName = loopFromName;
+          captureCurrentFaceForLoop("from");
+        } else if (expressionSelect.value === customLoopSetValue) {
+          updateLoopSelectValues();
         } else {
           loopFromName = expressionSelect.value;
           loopFromUsesCustom = false;
           currentName = loopFromName;
           currentExpression = getExpressionByName(currentName);
+          hasSliderChanges = false;
+          syncLoopCaptureButtons();
         }
-        hasSliderChanges = false;
-        syncLoopCaptureButtons();
+        updateControlStatus();
         render();
       });
       previewLoopTarget.addEventListener("change", () => {
         cancelPreviewAnimation();
         if (previewLoopTarget.value === customLoopValue) {
-          loopToUsesCustom = true;
+          captureCurrentFaceForLoop("to");
+        } else if (previewLoopTarget.value === customLoopSetValue) {
+          updateLoopSelectValues();
         } else {
           loopToName = previewLoopTarget.value;
           loopToUsesCustom = false;
+          currentName = loopToName;
+          currentExpression = getExpressionByName(currentName);
+          hasSliderChanges = false;
+          syncLoopCaptureButtons();
         }
-        hasSliderChanges = false;
-        syncLoopCaptureButtons();
+        updateControlStatus();
         render();
       });
       syncLoopCaptureButtons();
@@ -2682,39 +2905,36 @@
       render();
     });
 
-    setLoopFromButton.addEventListener("click", () => {
-      cancelPreviewAnimation();
-      if (!hasSliderChanges) {
-        updateLoopSelectValues();
-        flashButtonLabel(setLoopFromButton, "Preset");
-        render();
-        return;
-      }
-      loopFromCustomExpression = normalizeDynamicExpressionConstraints(clonePreset(currentExpression));
-      loopFromUsesCustom = true;
-      hasSliderChanges = false;
-      expressionSelect.value = customLoopValue;
-      currentName = loopFromName;
-      syncLoopCaptureButtons();
-      flashButtonLabel(setLoopFromButton, "Saved");
-      render();
+    moodChips.querySelectorAll("button").forEach((button) => {
+      button.addEventListener("click", () => applyMoodChip(button.dataset.preset));
     });
 
-    setLoopToButton.addEventListener("click", () => {
-      cancelPreviewAnimation();
-      if (!hasSliderChanges) {
-        updateLoopSelectValues();
-        flashButtonLabel(setLoopToButton, "Preset");
-        render();
-        return;
+    function moodPadPointFromEvent(event) {
+      const rect = moodPad.getBoundingClientRect();
+      let nx = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      let ny = (1 - (event.clientY - rect.top) / rect.height) * 2 - 1;
+      const mag = Math.sqrt(nx * nx + ny * ny);
+      if (mag > 1) {
+        nx /= mag;
+        ny /= mag;
       }
-      loopToCustomExpression = normalizeDynamicExpressionConstraints(clonePreset(currentExpression));
-      loopToUsesCustom = true;
-      hasSliderChanges = false;
-      previewLoopTarget.value = customLoopValue;
-      syncLoopCaptureButtons();
-      flashButtonLabel(setLoopToButton, "Saved");
-      render();
+      return [nx, ny];
+    }
+
+    let moodPadDragging = false;
+    moodPad.addEventListener("pointerdown", (event) => {
+      moodPadDragging = true;
+      moodPad.setPointerCapture(event.pointerId);
+      applyMoodPadPosition(...moodPadPointFromEvent(event));
+    });
+    moodPad.addEventListener("pointermove", (event) => {
+      if (!moodPadDragging) return;
+      applyMoodPadPosition(...moodPadPointFromEvent(event));
+    });
+    ["pointerup", "pointercancel", "pointerleave"].forEach((eventName) => {
+      moodPad.addEventListener(eventName, () => {
+        moodPadDragging = false;
+      });
     });
 
     applyDeviceLayout();
