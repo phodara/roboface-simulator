@@ -444,18 +444,6 @@
       display: none;
     }
 
-    .mood-chips {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-    }
-
-    .mood-chips button {
-      padding: 10px 4px;
-      font-size: 0.66rem;
-      min-height: 44px;
-    }
-
     .mood-pad-wrap {
       display: flex;
       justify-content: center;
@@ -576,11 +564,7 @@
     }
 
     body.smartphone .stage-footer {
-      max-width: min(100%, calc(var(--phone-stage-height) * 0.75));
-      margin: 3px auto 0;
-      font-size: 1.04rem;
-      letter-spacing: 0.04em;
-      line-height: 1.2;
+      display: none;
     }
 
     body.smartphone .controls > .control-group:last-child {
@@ -637,6 +621,22 @@
         <span>More Faceimator Vidiotbox Nonsense.</span>
         <span>Copyright 2026 Paul Hodara.</span>
       </p>
+      <section class="control-group" id="moodPadPanel">
+        <h2>Quick Pose</h2>
+        <div class="control-card">
+          <p class="helper-line">Drag inside the circle to blend between moods.</p>
+          <div class="mood-pad-wrap">
+            <div class="mood-pad" id="moodPad">
+              <div class="mood-pad-label mood-pad-label--happy">Happy</div>
+              <div class="mood-pad-label mood-pad-label--angry">Angry</div>
+              <div class="mood-pad-label mood-pad-label--sad">Sad</div>
+              <div class="mood-pad-label mood-pad-label--loving">Loving</div>
+              <div class="mood-pad-handle" id="moodPadHandle"></div>
+            </div>
+          </div>
+          <p class="helper-line">Use Loop From / Loop To below and choose "Custom capture current face" to save this pose into a loop.</p>
+        </div>
+      </section>
     </section>
 
     <aside class="controls">
@@ -676,33 +676,6 @@
         </div>
       </section>
 
-      <section class="control-group" id="moodPadPanel">
-        <h2>Quick Pose</h2>
-        <div class="control-card">
-          <p class="control-card-title">Mood Chips</p>
-          <div class="mood-chips" id="moodChips">
-            <button type="button" data-preset="neutral">Neutral</button>
-            <button type="button" data-preset="happy">Happy</button>
-            <button type="button" data-preset="angry">Angry</button>
-            <button type="button" data-preset="surprised">Surprised</button>
-            <button type="button" data-preset="sad">Sad</button>
-            <button type="button" data-preset="sleepy">Sleepy</button>
-            <button type="button" data-preset="loving">Loving</button>
-          </div>
-          <p class="helper-line">Tap a mood, or drag inside the circle to blend between moods.</p>
-          <div class="mood-pad-wrap">
-            <div class="mood-pad" id="moodPad">
-              <div class="mood-pad-label mood-pad-label--happy">Happy</div>
-              <div class="mood-pad-label mood-pad-label--angry">Angry</div>
-              <div class="mood-pad-label mood-pad-label--sad">Sad</div>
-              <div class="mood-pad-label mood-pad-label--loving">Loving</div>
-              <div class="mood-pad-handle" id="moodPadHandle"></div>
-            </div>
-          </div>
-          <p class="helper-line">Use Loop From / Loop To above and choose "Custom capture current face" to save this pose into a loop.</p>
-        </div>
-      </section>
-
       <section class="control-group" id="sliderPanel">
         <h2>Geometry</h2>
       </section>
@@ -729,7 +702,6 @@
     const previewRepeats = document.getElementById("previewRepeats");
     const loopFromStatus = document.getElementById("loopFromStatus");
     const loopToStatus = document.getElementById("loopToStatus");
-    const moodChips = document.getElementById("moodChips");
     const moodPad = document.getElementById("moodPad");
     const moodPadHandle = document.getElementById("moodPadHandle");
     const showExportPanel = false;
@@ -739,6 +711,15 @@
         || (/Mobile/i.test(navigator.userAgent) && window.innerWidth <= 1024)
         || (window.matchMedia("(pointer: coarse)").matches && window.innerWidth <= 900);
       document.body.classList.toggle("smartphone", isPhoneLike);
+      syncMoodPadSize();
+    }
+
+    function syncMoodPadSize() {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        moodPad.style.width = `${rect.width}px`;
+        moodPad.style.height = `${rect.height}px`;
+      }
     }
 
     function applyPanelVisibility() {
@@ -1088,14 +1069,6 @@
       moodPadHandle.style.top = `${((1 - ny) / 2) * 100}%`;
     }
 
-    const moodCorners = {
-      neutral: [0, 0],
-      happy: [1, 1],
-      angry: [-1, 1],
-      sad: [-1, -1],
-      loving: [1, -1]
-    };
-
     function blendMoodPad(nx, ny) {
       const r = clamp(Math.sqrt(nx * nx + ny * ny), 0, 1);
       const tx = clamp((nx + 1) / 2, 0, 1);
@@ -1121,19 +1094,6 @@
       currentName = "custom";
       currentExpression = blendMoodPad(nx, ny);
       hasSliderChanges = true;
-      syncSliders();
-      render();
-    }
-
-    function applyMoodChip(name) {
-      cancelPreviewAnimation();
-      currentName = name;
-      currentExpression = getExpressionByName(name);
-      hasSliderChanges = false;
-      if (moodCorners[name]) {
-        setMoodPadHandlePosition(moodCorners[name][0], moodCorners[name][1]);
-      }
-      syncLoopCaptureButtons();
       syncSliders();
       render();
     }
@@ -2903,10 +2863,6 @@
     stopPreviewButton.addEventListener("click", () => {
       cancelPreviewAnimation();
       render();
-    });
-
-    moodChips.querySelectorAll("button").forEach((button) => {
-      button.addEventListener("click", () => applyMoodChip(button.dataset.preset));
     });
 
     function moodPadPointFromEvent(event) {
