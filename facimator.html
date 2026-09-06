@@ -192,6 +192,10 @@
       gap: 8px;
     }
 
+    .button-row button:only-child {
+      grid-column: 1 / -1;
+    }
+
     .value {
       min-width: 3ch;
       text-align: right;
@@ -416,6 +420,9 @@
           <button id="previewLoopButton" type="button">Loop Play</button>
           <button id="stopPreviewButton" type="button">Stop</button>
         </div>
+        <div class="button-row">
+          <button id="downloadGifButton" type="button">Download GIF</button>
+        </div>
       </section>
 
       <section class="control-group" id="sliderPanel">
@@ -439,6 +446,7 @@
     const copyButton = document.getElementById("copyButton");
     const previewLoopButton = document.getElementById("previewLoopButton");
     const stopPreviewButton = document.getElementById("stopPreviewButton");
+    const downloadGifButton = document.getElementById("downloadGifButton");
     const previewLoopTarget = document.getElementById("previewLoopTarget");
     const previewRepeats = document.getElementById("previewRepeats");
     const setLoopFromButton = document.getElementById("setLoopFromButton");
@@ -2101,6 +2109,279 @@
       if (stroke) context.stroke();
     }
 
+    function drawCurrentFaceFrame({ includeBackground = true, includeGrid = true } = {}) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (includeBackground) {
+        ctx.save();
+        ctx.fillStyle = "#fbf7ef";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
+      }
+      if (includeGrid) drawGrid();
+      drawMainBaseFace();
+      drawHair();
+      drawConstructionOverlay();
+    }
+
+    function writeLittleEndian16(bytes, value) {
+      bytes.push(value & 0xff, (value >> 8) & 0xff);
+    }
+
+    function writeAscii(bytes, text) {
+      for (let index = 0; index < text.length; index += 1) {
+        bytes.push(text.charCodeAt(index));
+      }
+    }
+
+    function nearestPaletteIndex(r, g, b, palette, cache, startIndex = 0) {
+      const key = `${r >> 3},${g >> 3},${b >> 3}`;
+      if (cache.has(key)) return cache.get(key);
+
+      let bestIndex = startIndex;
+      let bestDistance = Infinity;
+      for (let index = startIndex; index < palette.length; index += 1) {
+        const color = palette[index];
+        const dr = r - color[0];
+        const dg = g - color[1];
+        const db = b - color[2];
+        const distance = dr * dr + dg * dg + db * db;
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestIndex = index;
+        }
+      }
+      cache.set(key, bestIndex);
+      return bestIndex;
+    }
+
+    function buildGifPaletteFromPixels(pixels, maxColors = 128) {
+      if (pixels.length === 0) return Array.from({ length: maxColors }, () => [0, 0, 0]);
+
+      const colorRange = (colors, channel) => {
+        let min = 255;
+        let max = 0;
+        colors.forEach((color) => {
+          min = Math.min(min, color[channel]);
+          max = Math.max(max, color[channel]);
+        });
+        return max - min;
+      };
+
+      const boxes = [pixels];
+      while (boxes.length < maxColors) {
+        boxes.sort((a, b) => {
+          const aRange = Math.max(colorRange(a, 0), colorRange(a, 1), colorRange(a, 2));
+          const bRange = Math.max(colorRange(b, 0), colorRange(b, 1), colorRange(b, 2));
+          return bRange - aRange;
+        });
+        const box = boxes.shift();
+        if (!box || box.length <= 1) {
+          if (box) boxes.push(box);
+          break;
+        }
+        const channelRanges = [colorRange(box, 0), colorRange(box, 1), colorRange(box, 2)];
+        const channel = channelRanges.indexOf(Math.max(...channelRanges));
+        box.sort((a, b) => a[channel] - b[channel]);
+        const midpoint = Math.floor(box.length / 2);
+        boxes.push(box.slice(0, midpoint), box.slice(midpoint));
+      }
+
+      const palette = boxes.map((box) => {
+        const total = box.reduce((sum, color) => {
+          sum[0] += color[0];
+          sum[1] += color[1];
+          sum[2] += color[2];
+          return sum;
+        }, [0, 0, 0]);
+        const count = Math.max(1, box.length);
+        return total.map((value) => Math.round(value / count));
+      });
+
+      while (palette.length < maxColors) palette.push([0, 0, 0]);
+      return palette.slice(0, maxColors);
+    }
+
+    function buildGifPaletteFromFrames(frames, maxColors = 128) {
+      const pixels = [];
+      frames.forEach((imageData, frameIndex) => {
+        const data = imageData.data;
+        const stride = frameIndex % 3 === 0 ? 16 : 64;
+        for (let index = 0; index < data.length; index += stride) {
+          if (data[index + 3] < 128) continue;
+          pixels.push([data[index], data[index + 1], data[index + 2]]);
+        }
+      });
+      return [[0, 255, 0], ...buildGifPaletteFromPixels(pixels, maxColors - 1)];
+    }
+
+    function indexedPixelsFromImageData(imageData, palette, transparentIndex = 0) {
+      const data = imageData.data;
+      const indexed = new Uint8Array(imageData.width * imageData.height);
+      const cache = new Map();
+      for (let source = 0, target = 0; source < data.length; source += 4, target += 1) {
+        if (data[source + 3] < 128) {
+          indexed[target] = transparentIndex;
+        } else {
+          indexed[target] = nearestPaletteIndex(data[source], data[source + 1], data[source + 2], palette, cache, 1);
+        }
+      }
+      return indexed;
+    }
+
+    function lzwEncode(indices, minCodeSize) {
+      const clearCode = 1 << minCodeSize;
+      const endCode = clearCode + 1;
+      let codeSize = minCodeSize + 1;
+      let bitBuffer = 0;
+      let bitCount = 0;
+      const output = [];
+      let codesSinceClear = 0;
+
+      const writeCode = (code) => {
+        bitBuffer |= code << bitCount;
+        bitCount += codeSize;
+        while (bitCount >= 8) {
+          output.push(bitBuffer & 0xff);
+          bitBuffer >>= 8;
+          bitCount -= 8;
+        }
+      };
+
+      writeCode(clearCode);
+      for (let index = 0; index < indices.length; index += 1) {
+        writeCode(indices[index]);
+        codesSinceClear += 1;
+        if (codesSinceClear >= 120 && index < indices.length - 1) {
+          writeCode(clearCode);
+          codesSinceClear = 0;
+          codeSize = minCodeSize + 1;
+        }
+      }
+
+      writeCode(endCode);
+      if (bitCount > 0) output.push(bitBuffer & 0xff);
+      return output;
+    }
+
+    function writeGifSubBlocks(bytes, data) {
+      for (let index = 0; index < data.length; index += 255) {
+        const block = data.slice(index, index + 255);
+        bytes.push(block.length, ...block);
+      }
+      bytes.push(0);
+    }
+
+    function encodeGif(frames, width, height, delayMs) {
+      const bytes = [];
+      const paletteSize = 128;
+      const minCodeSize = 7;
+      const colorTableSizeFlag = Math.log2(paletteSize) - 1;
+      const palette = buildGifPaletteFromFrames(frames, paletteSize);
+
+      writeAscii(bytes, "GIF89a");
+      writeLittleEndian16(bytes, width);
+      writeLittleEndian16(bytes, height);
+      bytes.push(0x80 | 0x70 | colorTableSizeFlag, 0, 0);
+      palette.forEach((color) => bytes.push(color[0], color[1], color[2]));
+
+      writeAscii(bytes, "!\xff\x0bNETSCAPE2.0\x03\x01");
+      writeLittleEndian16(bytes, 0);
+      bytes.push(0);
+
+      frames.forEach((imageData) => {
+        const indexedPixels = indexedPixelsFromImageData(imageData, palette, 0);
+        const compressedPixels = lzwEncode(indexedPixels, minCodeSize);
+
+        bytes.push(0x21, 0xf9, 0x04, 0x09);
+        writeLittleEndian16(bytes, Math.max(2, Math.round(delayMs / 10)));
+        bytes.push(0, 0);
+
+        bytes.push(0x2c);
+        writeLittleEndian16(bytes, 0);
+        writeLittleEndian16(bytes, 0);
+        writeLittleEndian16(bytes, width);
+        writeLittleEndian16(bytes, height);
+        bytes.push(0);
+
+        bytes.push(minCodeSize);
+        writeGifSubBlocks(bytes, compressedPixels);
+      });
+
+      bytes.push(0x3b);
+      return new Blob([new Uint8Array(bytes)], { type: "image/gif" });
+    }
+
+    function loopExpressionAt(startExpression, endExpression, phaseProgress) {
+      const phaseIndex = Math.floor(phaseProgress);
+      const phaseT = easeInOutCubic(phaseProgress - phaseIndex);
+      return mixExpressions(
+        phaseIndex % 2 === 0 ? startExpression : endExpression,
+        phaseIndex % 2 === 0 ? endExpression : startExpression,
+        phaseT
+      );
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    async function downloadLoopGif() {
+      const originalExpression = clonePreset(currentExpression);
+      const originalName = currentName;
+      const originalPreviewAnimation = previewAnimation;
+      downloadGifButton.disabled = true;
+      downloadGifButton.textContent = "Making GIF...";
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+
+      try {
+        const repeats = clamp(Number(previewRepeats.value) || 1, 1, 20);
+        const startExpression = resolveLoopFromExpression();
+        const endExpression = resolveLoopToExpression();
+        const phaseDurationMs = 900;
+        const fps = 12;
+        const totalPhases = repeats * 2;
+        const frameCount = Math.ceil((phaseDurationMs * totalPhases / 1000) * fps);
+        const gifWidth = 240;
+        const gifHeight = 360;
+        const gifCanvas = document.createElement("canvas");
+        const gifCtx = gifCanvas.getContext("2d", { willReadFrequently: true });
+        const frames = [];
+
+        gifCanvas.width = gifWidth;
+        gifCanvas.height = gifHeight;
+        previewAnimation = null;
+        for (let frameIndex = 0; frameIndex < frameCount; frameIndex += 1) {
+          const phaseProgress = (frameIndex / frameCount) * totalPhases;
+          currentExpression = loopExpressionAt(startExpression, endExpression, phaseProgress);
+          currentName = loopFromName;
+          drawCurrentFaceFrame({ includeBackground: false, includeGrid: false });
+          gifCtx.clearRect(0, 0, gifWidth, gifHeight);
+          gifCtx.drawImage(canvas, 0, 0, gifWidth, gifHeight);
+          frames.push(gifCtx.getImageData(0, 0, gifWidth, gifHeight));
+        }
+
+        const blob = encodeGif(frames, gifWidth, gifHeight, 1000 / fps);
+        downloadBlob(blob, `faceimator-${loopFromName}-loop.gif`);
+      } catch (error) {
+        console.error(error);
+        flashButtonLabel(downloadGifButton, "Failed");
+      } finally {
+        currentExpression = originalExpression;
+        currentName = originalName;
+        previewAnimation = originalPreviewAnimation;
+        downloadGifButton.disabled = false;
+        downloadGifButton.textContent = "Download GIF";
+        render();
+      }
+    }
+
     function render() {
       if (previewAnimation) {
         const elapsed = performance.now() - previewAnimation.startTime;
@@ -2126,11 +2407,7 @@
           currentName = loopFromName;
         }
       }
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawGrid();
-      drawMainBaseFace();
-      drawHair();
-      drawConstructionOverlay();
+      drawCurrentFaceFrame();
       syncSliders();
     }
 
@@ -2214,6 +2491,10 @@
         repeats
       );
       render();
+    });
+
+    downloadGifButton.addEventListener("click", () => {
+      downloadLoopGif();
     });
 
     stopPreviewButton.addEventListener("click", () => {
