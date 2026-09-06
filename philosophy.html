@@ -211,6 +211,54 @@
     text-transform: uppercase;
   }
 
+  .music-credit {
+    margin-top: 46px;
+    color: var(--muted);
+    font-size: clamp(18px, 2.4vw, 28px);
+    line-height: 1.35;
+  }
+
+  .music-credit a {
+    color: var(--cyan);
+  }
+
+  .crawl-paused .crawl {
+    animation-play-state: paused;
+  }
+
+  .crawl-start {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background: rgba(17, 17, 17, .82);
+  }
+
+  .crawl-start[hidden] {
+    display: none;
+  }
+
+  .crawl-start button {
+    padding: 16px 22px;
+    background: #101010;
+    border: 1px solid var(--cyan-strong);
+    color: var(--cyan);
+    box-shadow: 0 0 0 1px rgba(0, 229, 255, .2);
+    cursor: pointer;
+    font: 900 18px/1 Arial, Helvetica, sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .crawl-start button:hover,
+  .crawl-start button:focus {
+    border-color: var(--green);
+    color: var(--green);
+    outline: none;
+  }
+
   @keyframes philosophy-crawl {
     from {
       transform: rotateX(68deg) translateY(0) scale(.92);
@@ -289,7 +337,7 @@
   }
 </style>
 </head>
-<body>
+<body class="crawl-paused">
 <script src="assets/site-menu.js"></script>
 <main class="crawl-stage">
   <div class="crawl">
@@ -327,19 +375,41 @@
   <p>We are attempting to make it <strong>slightly more interesting.</strong></p>
 
   <p class="end">WHAT THE WORLD NEEDS IS MORE NONSENSE!</p>
+  <p class="music-credit">Music: Giuseppe Verdi, <em>Messa da requiem, Dies irae</em>. Recording from ICBSA via <a href="https://commons.wikimedia.org/wiki/File:ICBSA_Verdi_-_Messa_da_requiem_parte_03,_Dies_irae.ogg">Wikimedia Commons</a>, licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
   </div>
 </main>
+<audio id="crawlMusic" src="assets/audio/verdi-dies-irae.mp3" preload="auto" loop></audio>
+<div class="crawl-start" id="crawlStart" hidden>
+  <button id="crawlStartButton" type="button">Start the Nonsense</button>
+</div>
 <script>
   const crawl = document.querySelector('.crawl');
+  const crawlMusic = document.getElementById('crawlMusic');
+  const crawlStart = document.getElementById('crawlStart');
+  const crawlStartButton = document.getElementById('crawlStartButton');
   let returningHome = false;
+
+  async function startCrawl() {
+    try {
+      crawlMusic.currentTime = 0;
+      await crawlMusic.play();
+      document.body.classList.remove('crawl-paused');
+      crawlStart.hidden = true;
+    } catch (error) {
+      crawlStart.hidden = false;
+    }
+  }
 
   function returnHome() {
     if (returningHome) return;
     returningHome = true;
+    crawlMusic.pause();
     window.location.href = 'index.html';
   }
 
+  crawlStartButton.addEventListener('click', startCrawl);
   crawl.addEventListener('animationend', returnHome);
+  startCrawl();
 </script>
 </body>
 </html>
