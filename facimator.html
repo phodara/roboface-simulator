@@ -2332,7 +2332,23 @@
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 
+    function promptForGifFilename() {
+      const defaultName = `faceimator-${loopFromName}-loop.gif`;
+      const enteredName = window.prompt("Save GIF as", defaultName);
+      if (enteredName === null) return null;
+
+      const cleanedName = enteredName
+        .trim()
+        .replace(/[<>:"/\\|?*\x00-\x1f]/g, "-")
+        .replace(/\s+/g, " ");
+      const filename = cleanedName || defaultName;
+      return /\.gif$/i.test(filename) ? filename : `${filename}.gif`;
+    }
+
     async function downloadLoopGif() {
+      const filename = promptForGifFilename();
+      if (!filename) return;
+
       const originalExpression = clonePreset(currentExpression);
       const originalName = currentName;
       const originalPreviewAnimation = previewAnimation;
@@ -2368,7 +2384,7 @@
         }
 
         const blob = encodeGif(frames, gifWidth, gifHeight, 1000 / fps);
-        downloadBlob(blob, `faceimator-${loopFromName}-loop.gif`);
+        downloadBlob(blob, filename);
       } catch (error) {
         console.error(error);
         flashButtonLabel(downloadGifButton, "Failed");
