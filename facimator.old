@@ -248,50 +248,6 @@
       gap: 6px;
     }
 
-    .control-card {
-      display: grid;
-      gap: 8px;
-      padding: 10px;
-      background: var(--paper);
-      border: 3px solid var(--ink);
-    }
-
-    .control-card-title {
-      margin: 0;
-      color: var(--ink);
-      font-size: 0.76rem;
-      font-weight: 950;
-      letter-spacing: 0.08em;
-      line-height: 1.2;
-      text-transform: uppercase;
-    }
-
-    .status-line {
-      min-height: 1.25em;
-      color: var(--muted);
-      font-size: 0.68rem;
-      font-weight: 900;
-      letter-spacing: 0.04em;
-      line-height: 1.25;
-      text-transform: uppercase;
-    }
-
-    .helper-line {
-      margin: -2px 0 0;
-      color: var(--muted);
-      font-size: 0.64rem;
-      font-weight: 900;
-      letter-spacing: 0.03em;
-      line-height: 1.25;
-      text-transform: uppercase;
-    }
-
-    .loop-row {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 6px;
-    }
-
     .control-group h2 {
       margin: 0;
       font-size: 0.88rem;
@@ -324,14 +280,6 @@
       min-width: 52px;
       padding: 8px 0;
       letter-spacing: 0;
-      text-align: center;
-    }
-
-    .capture-button {
-      min-height: 38px;
-      padding: 8px;
-      font-size: 0.72rem;
-      letter-spacing: 0.03em;
       text-align: center;
     }
 
@@ -608,38 +556,30 @@
 
     <aside class="controls">
       <section class="control-group">
-        <h2>Faceimator V2</h2>
-        <div class="control-card">
-          <p class="control-card-title">Loop From</p>
-          <div class="loop-row">
-            <label for="expressionSelect">Preset or Capture</label>
-            <select id="expressionSelect"></select>
-          </div>
-          <p class="helper-line">For custom, adjust Geometry sliders and select Custom Capture dropdown.</p>
-          <div class="status-line" id="loopFromStatus">Using preset: Neutral</div>
+        <h2>Faceimator Animator</h2>
+        <div class="row row-with-action">
+          <label for="expressionSelect">Loop From</label>
+          <button id="setLoopFromButton" type="button">Set</button>
+          <select id="expressionSelect"></select>
         </div>
-        <div class="control-card">
-          <p class="control-card-title">Loop To</p>
-          <div class="loop-row">
-            <label for="previewLoopTarget">Preset or Capture</label>
-            <select id="previewLoopTarget"></select>
-          </div>
-          <p class="helper-line">For custom, adjust Geometry sliders and select Custom Capture dropdown.</p>
-          <div class="status-line" id="loopToStatus">Using preset: Neutral</div>
+        <div class="row row-with-action">
+          <label for="previewLoopTarget">Loop To</label>
+          <button id="setLoopToButton" type="button">Set</button>
+          <select id="previewLoopTarget"></select>
+        </div>
+        <div class="button-row">
+          <button id="copyButton" type="button">Copy JSON</button>
         </div>
         <div class="row">
           <label for="previewRepeats">Repeats</label>
           <input id="previewRepeats" type="number" min="1" max="20" step="1" value="3">
         </div>
         <div class="button-row">
-          <button id="previewLoopButton" type="button">Preview Loop</button>
+          <button id="previewLoopButton" type="button">Loop Play</button>
           <button id="stopPreviewButton" type="button">Stop</button>
         </div>
         <div class="button-row">
-          <button id="downloadGifButton" type="button">Export GIF</button>
-        </div>
-        <div class="button-row">
-          <button id="copyButton" type="button">Copy JSON</button>
+          <button id="downloadGifButton" type="button">Download GIF</button>
         </div>
       </section>
 
@@ -667,8 +607,8 @@
     const downloadGifButton = document.getElementById("downloadGifButton");
     const previewLoopTarget = document.getElementById("previewLoopTarget");
     const previewRepeats = document.getElementById("previewRepeats");
-    const loopFromStatus = document.getElementById("loopFromStatus");
-    const loopToStatus = document.getElementById("loopToStatus");
+    const setLoopFromButton = document.getElementById("setLoopFromButton");
+    const setLoopToButton = document.getElementById("setLoopToButton");
     const showExportPanel = false;
 
     function applyDeviceLayout() {
@@ -940,7 +880,6 @@
     const highOpenOvalSubdivisionPasses = 1;
 
     const customLoopValue = "__custom__";
-    const customLoopSetValue = "__custom_set__";
 
     let currentName = "neutral";
     let currentExpression = { ...expressionDefaults, ...clonePreset(presets[currentName]) };
@@ -978,12 +917,16 @@
     }
 
     function setPreviewButtons(isPlaying) {
-      previewLoopButton.textContent = isPlaying ? "Previewing..." : "Preview Loop";
+      previewLoopButton.textContent = isPlaying ? "Looping..." : "Loop Play";
       stopPreviewButton.disabled = !isPlaying;
       expressionSelect.disabled = isPlaying;
       previewLoopTarget.disabled = isPlaying;
-      if (!isPlaying) syncLoopCaptureButtons();
-      updateControlStatus();
+      if (isPlaying) {
+        setLoopFromButton.disabled = true;
+        setLoopToButton.disabled = true;
+      } else {
+        syncLoopCaptureButtons();
+      }
     }
 
     function getExpressionByName(name) {
@@ -1021,22 +964,8 @@
     }
 
     function updateLoopSelectValues() {
-      expressionSelect.value = loopFromUsesCustom ? customLoopSetValue : loopFromName;
-      previewLoopTarget.value = loopToUsesCustom ? customLoopSetValue : loopToName;
-    }
-
-    function displayExpressionName(name) {
-      return name.charAt(0).toUpperCase() + name.slice(1);
-    }
-
-    function updateControlStatus() {
-      const editNote = hasSliderChanges ? " - current edits not captured" : "";
-      loopFromStatus.textContent = loopFromUsesCustom
-        ? `Custom capture is set from ${displayExpressionName(loopFromName)}${editNote}`
-        : `Using preset: ${displayExpressionName(loopFromName)}`;
-      loopToStatus.textContent = loopToUsesCustom
-        ? `Custom capture is set from ${displayExpressionName(loopToName)}${editNote}`
-        : `Using preset: ${displayExpressionName(loopToName)}`;
+      expressionSelect.value = loopFromUsesCustom ? customLoopValue : loopFromName;
+      previewLoopTarget.value = loopToUsesCustom ? customLoopValue : loopToName;
     }
 
     function flashButtonLabel(button, label) {
@@ -1049,25 +978,8 @@
 
     function syncLoopCaptureButtons() {
       if (previewAnimation) return;
-      updateControlStatus();
-    }
-
-    function captureCurrentFaceForLoop(endpoint) {
-      const capturedExpression = normalizeDynamicExpressionConstraints(clonePreset(currentExpression));
-
-      if (endpoint === "from") {
-        loopFromName = currentName;
-        loopFromCustomExpression = capturedExpression;
-        loopFromUsesCustom = true;
-      } else {
-        loopToName = currentName;
-        loopToCustomExpression = capturedExpression;
-        loopToUsesCustom = true;
-      }
-
-      hasSliderChanges = false;
-      updateLoopSelectValues();
-      syncLoopCaptureButtons();
+      setLoopFromButton.disabled = false;
+      setLoopToButton.disabled = false;
     }
 
     function runPreviewLoop(startExpression, endExpression, repeats) {
@@ -1257,7 +1169,6 @@
         objects: baseFaceObjects,
         expression: currentExpression
       }, null, 2);
-      updateControlStatus();
     }
 
     function drawBezierObject(targetCtx, object, transform) {
@@ -2646,7 +2557,7 @@
         currentName = originalName;
         previewAnimation = originalPreviewAnimation;
         downloadGifButton.disabled = false;
-        downloadGifButton.textContent = "Export GIF";
+        downloadGifButton.textContent = "Download GIF";
         render();
       }
     }
@@ -2686,11 +2597,6 @@
     }
 
     function populateExpressions() {
-      const fromSetOption = document.createElement("option");
-      fromSetOption.value = customLoopSetValue;
-      fromSetOption.textContent = "Is Set";
-      fromSetOption.hidden = true;
-      expressionSelect.append(fromSetOption);
       Object.keys(presets).forEach((name) => {
         const option = document.createElement("option");
         option.value = name;
@@ -2699,13 +2605,8 @@
       });
       const fromCustomOption = document.createElement("option");
       fromCustomOption.value = customLoopValue;
-      fromCustomOption.textContent = "Custom capture current face";
+      fromCustomOption.textContent = "Custom";
       expressionSelect.append(fromCustomOption);
-      const toSetOption = document.createElement("option");
-      toSetOption.value = customLoopSetValue;
-      toSetOption.textContent = "Is Set";
-      toSetOption.hidden = true;
-      previewLoopTarget.append(toSetOption);
       Object.keys(presets).forEach((name) => {
         const option = document.createElement("option");
         option.value = name;
@@ -2714,41 +2615,35 @@
       });
       const toCustomOption = document.createElement("option");
       toCustomOption.value = customLoopValue;
-      toCustomOption.textContent = "Custom capture current face";
+      toCustomOption.textContent = "Custom";
       previewLoopTarget.append(toCustomOption);
       updateLoopSelectValues();
       expressionSelect.addEventListener("change", () => {
         cancelPreviewAnimation();
         if (expressionSelect.value === customLoopValue) {
-          captureCurrentFaceForLoop("from");
-        } else if (expressionSelect.value === customLoopSetValue) {
-          updateLoopSelectValues();
+          loopFromUsesCustom = true;
+          currentExpression = resolveLoopFromExpression();
+          currentName = loopFromName;
         } else {
           loopFromName = expressionSelect.value;
           loopFromUsesCustom = false;
           currentName = loopFromName;
           currentExpression = getExpressionByName(currentName);
-          hasSliderChanges = false;
-          syncLoopCaptureButtons();
         }
-        updateControlStatus();
+        hasSliderChanges = false;
+        syncLoopCaptureButtons();
         render();
       });
       previewLoopTarget.addEventListener("change", () => {
         cancelPreviewAnimation();
         if (previewLoopTarget.value === customLoopValue) {
-          captureCurrentFaceForLoop("to");
-        } else if (previewLoopTarget.value === customLoopSetValue) {
-          updateLoopSelectValues();
+          loopToUsesCustom = true;
         } else {
           loopToName = previewLoopTarget.value;
           loopToUsesCustom = false;
-          currentName = loopToName;
-          currentExpression = getExpressionByName(currentName);
-          hasSliderChanges = false;
-          syncLoopCaptureButtons();
         }
-        updateControlStatus();
+        hasSliderChanges = false;
+        syncLoopCaptureButtons();
         render();
       });
       syncLoopCaptureButtons();
@@ -2784,6 +2679,41 @@
 
     stopPreviewButton.addEventListener("click", () => {
       cancelPreviewAnimation();
+      render();
+    });
+
+    setLoopFromButton.addEventListener("click", () => {
+      cancelPreviewAnimation();
+      if (!hasSliderChanges) {
+        updateLoopSelectValues();
+        flashButtonLabel(setLoopFromButton, "Preset");
+        render();
+        return;
+      }
+      loopFromCustomExpression = normalizeDynamicExpressionConstraints(clonePreset(currentExpression));
+      loopFromUsesCustom = true;
+      hasSliderChanges = false;
+      expressionSelect.value = customLoopValue;
+      currentName = loopFromName;
+      syncLoopCaptureButtons();
+      flashButtonLabel(setLoopFromButton, "Saved");
+      render();
+    });
+
+    setLoopToButton.addEventListener("click", () => {
+      cancelPreviewAnimation();
+      if (!hasSliderChanges) {
+        updateLoopSelectValues();
+        flashButtonLabel(setLoopToButton, "Preset");
+        render();
+        return;
+      }
+      loopToCustomExpression = normalizeDynamicExpressionConstraints(clonePreset(currentExpression));
+      loopToUsesCustom = true;
+      hasSliderChanges = false;
+      previewLoopTarget.value = customLoopValue;
+      syncLoopCaptureButtons();
+      flashButtonLabel(setLoopToButton, "Saved");
       render();
     });
 
