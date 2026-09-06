@@ -2479,6 +2479,45 @@
       );
     }
 
+    let pendingAppleGifFile = null;
+
+    function isAppleTouchDevice() {
+      return /iP(hone|ad|od)/i.test(navigator.userAgent)
+        || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    }
+
+    function canShareGifFile(file) {
+      if (!navigator.share) return false;
+      if (!navigator.canShare) return true;
+
+      try {
+        return navigator.canShare({ files: [file] });
+      } catch (error) {
+        return false;
+      }
+    }
+
+    async function shareGifFile(file) {
+      downloadGifButton.disabled = true;
+      try {
+        await navigator.share({
+          files: [file],
+          title: "Faceimator GIF"
+        });
+        pendingAppleGifFile = null;
+        downloadGifButton.textContent = "Shared";
+        window.setTimeout(() => {
+          downloadGifButton.textContent = "Download GIF";
+        }, 900);
+      } catch (error) {
+        if (error && error.name !== "AbortError") {
+          flashButtonLabel(downloadGifButton, "Try Again");
+        }
+      } finally {
+        downloadGifButton.disabled = false;
+      }
+    }
+
     function downloadBlob(blob, filename) {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -2488,6 +2527,18 @@
       link.click();
       link.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function prepareApplePhotosSave(blob, filename) {
+      if (!isAppleTouchDevice() || typeof File === "undefined") return false;
+
+      const file = new File([blob], filename, { type: "image/gif" });
+      if (!canShareGifFile(file)) return false;
+
+      pendingAppleGifFile = file;
+      downloadGifButton.disabled = false;
+      downloadGifButton.textContent = "Save to Photos";
+      return true;
     }
 
     function promptForGifFilename() {
@@ -2542,6 +2593,8 @@
         }
 
         const blob = encodeGif(frames, gifWidth, gifHeight, 1000 / fps);
+        if (prepareApplePhotosSave(blob, filename)) return;
+
         downloadBlob(blob, filename);
       } catch (error) {
         console.error(error);
@@ -2550,8 +2603,10 @@
         currentExpression = originalExpression;
         currentName = originalName;
         previewAnimation = originalPreviewAnimation;
-        downloadGifButton.disabled = false;
-        downloadGifButton.textContent = "Download GIF";
+        if (!pendingAppleGifFile) {
+          downloadGifButton.disabled = false;
+          downloadGifButton.textContent = "Download GIF";
+        }
         render();
       }
     }
@@ -2668,6 +2723,10 @@
     });
 
     downloadGifButton.addEventListener("click", () => {
+      if (pendingAppleGifFile) {
+        shareGifFile(pendingAppleGifFile);
+        return;
+      }
       downloadLoopGif();
     });
 
