@@ -10,8 +10,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="assets/images/happy.png">
-  <title>Faceimator</title>
+  <title>Robot Face</title>
   <style>
     :root {
       --bg: #f5efe4;
@@ -36,106 +35,12 @@
       margin: 0;
       min-height: 100vh;
       color: var(--ink);
-      background: #000;
+      background:
+        radial-gradient(circle at top left, rgba(217, 93, 57, 0.18), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(13, 110, 110, 0.2), transparent 24%),
+        linear-gradient(180deg, #fbf7ef 0%, var(--bg) 100%);
       font-family: var(--ui-font);
       overflow: auto;
-      padding-top: 20px;
-      box-sizing: border-box;
-    }
-
-    .site-menu {
-      position: fixed;
-      top: 14px;
-      left: 14px;
-      z-index: 20;
-      font-family: var(--ui-font);
-    }
-
-    .menu-toggle {
-      width: 44px;
-      height: 44px;
-      display: grid;
-      place-items: center;
-      padding: 0;
-      background: #101010;
-      border: 1px solid #00E5FF;
-      color: #7dd3fc;
-      box-shadow: 0 0 0 1px rgba(0, 229, 255, .2);
-      cursor: pointer;
-    }
-
-    .menu-toggle:hover,
-    .menu-toggle:focus {
-      border-color: #0f0;
-      color: #0f0;
-      outline: none;
-    }
-
-    .menu-toggle span,
-    .menu-toggle::before,
-    .menu-toggle::after {
-      content: "";
-      display: block;
-      width: 20px;
-      height: 2px;
-      background: currentColor;
-      transition: transform .2s ease, opacity .2s ease;
-    }
-
-    .menu-toggle::before {
-      transform: translateY(-6px);
-    }
-
-    .menu-toggle::after {
-      transform: translateY(6px);
-    }
-
-    .site-menu[data-open="true"] .menu-toggle span {
-      opacity: 0;
-    }
-
-    .site-menu[data-open="true"] .menu-toggle::before {
-      transform: translateY(2px) rotate(45deg);
-    }
-
-    .site-menu[data-open="true"] .menu-toggle::after {
-      transform: translateY(-2px) rotate(-45deg);
-    }
-
-    .menu-panel {
-      position: absolute;
-      top: 54px;
-      left: 0;
-      width: min(260px, calc(100vw - 28px));
-      display: none;
-      padding: 10px;
-      background: #101010;
-      border: 1px solid #00E5FF;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, .45);
-    }
-
-    .site-menu[data-open="true"] .menu-panel {
-      display: grid;
-      gap: 8px;
-    }
-
-    .menu-panel a {
-      display: block;
-      padding: 12px;
-      color: #7dd3fc;
-      border: 1px solid #2a6f78;
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      text-decoration: none;
-      text-transform: uppercase;
-    }
-
-    .menu-panel a:hover,
-    .menu-panel a:focus {
-      border-color: #0f0;
-      color: #0f0;
-      outline: none;
     }
 
     .shell {
@@ -148,7 +53,6 @@
       align-items: start;
       transform: scale(0.8);
       transform-origin: top left;
-      background: transparent;
     }
 
     .controls {
@@ -163,7 +67,6 @@
 
     .stage {
       display: flex;
-      flex-direction: column;
       justify-content: flex-end;
       align-items: flex-start;
       padding: 0;
@@ -203,8 +106,7 @@
       border-radius: 16px;
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.3)),
-        linear-gradient(0deg, rgba(13, 110, 110, 0.05), rgba(217, 93, 57, 0.05)),
-        linear-gradient(180deg, #fbf7ef 0%, var(--bg) 100%);
+        linear-gradient(0deg, rgba(13, 110, 110, 0.05), rgba(217, 93, 57, 0.05));
       border: 1px solid rgba(25, 21, 18, 0.08);
     }
 
@@ -323,21 +225,6 @@
       line-height: 1.25;
     }
 
-    .license-note {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.72rem;
-      line-height: 1.35;
-      text-align: center;
-    }
-
-    .stage .license-note {
-      align-self: flex-end;
-      width: min(100%, 720px);
-      padding-top: 8px;
-      color: rgba(255, 251, 244, 0.72);
-    }
-
     .chip {
       display: inline-block;
       padding: 6px 10px;
@@ -360,7 +247,7 @@
       display: flex;
       flex-direction: column;
       gap: 2px;
-      padding: 50px 4px 4px;
+      padding: 0 4px 4px;
       width: 100%;
       height: auto;
       transform: none;
@@ -428,12 +315,6 @@
       margin-top: 0;
     }
 
-    body.smartphone .stage .license-note {
-      width: 100%;
-      padding-top: 2px;
-      font-size: 0.52rem;
-    }
-
     body.smartphone #sliderPanel {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       column-gap: 5px;
@@ -484,7 +365,6 @@
         height: auto;
         min-height: 100vh;
         transform: none;
-        padding-top: 50px;
       }
 
       body:not(.smartphone) #faceCanvas {
@@ -507,11 +387,9 @@
   </style>
 </head>
 <body>
-<script src="assets/site-menu.js"></script>
   <main class="shell">
     <section class="stage">
-      <canvas id="faceCanvas" width="720" height="960" aria-label="Face simulator preview"></canvas>
-      <p class="license-note">© 2026 Paul Hodara. Licensed under PolyForm Noncommercial 1.0.0.</p>
+      <canvas id="faceCanvas" width="720" height="1080" aria-label="Face simulator preview"></canvas>
     </section>
 
     <aside class="controls">
@@ -802,7 +680,8 @@
       ["pupilOffsetX", -0.2, 0.2, 0.005],
       ["pupilOffsetY", -0.12, 0.12, 0.005],
       ["hairLength", 0, 60, 1],
-      ["noseShift", 0, 1, 0.01],
+      ["noseDirection", -1, 1, 0.01],
+      ["noseBulb", -2, 2, 0.01],
       ["mouthCurve", -1.5, 1.5, 0.01],
       ["mouthDownturn", -1, 1.2, 0.01],
       ["mouthOpen", 0, 1, 0.001],
@@ -815,7 +694,8 @@
       angryMouth: 0,
       eyeballSize: 1.0,
       hairLength: 0,
-      noseShift: 0
+      noseDirection: 0,
+      noseBulb: 0
     };
 
     const angryMouthMorphStart = 0.82;
@@ -825,6 +705,7 @@
     const mouthOpenMax = 3.0;
     const mouthOffsetX = -15;
     const faceOffsetY = 120;
+    const faceLayoutHeight = 960;
     const lowMouthOpenTransitionStart = 0.06;
     const lowMouthOpenTransitionEnd = 0.15;
     const highOpenCapsuleWidthRatio = 0.46;
@@ -1142,6 +1023,50 @@
       targetCtx.stroke();
     }
 
+    function drawOrganicBezierObject(targetCtx, object, transform, seed = 0, options = {}) {
+      const baseWidth = targetCtx.lineWidth;
+      const baseStroke = targetCtx.strokeStyle;
+      const smudge = options.smudge ?? 1;
+      const passes = [
+        { offset: 0, width: 1.08, alpha: 0.92 },
+        { offset: 1, width: 0.68, alpha: 0.42 },
+        { offset: 2, width: 0.46, alpha: 0.32 },
+        { offset: 3, width: 0.28, alpha: 0.24 },
+        { offset: 4, width: 0.34 * smudge, alpha: 0.12 * smudge }
+      ];
+      const wobble = 7 * smudge;
+
+      const mapPoint = ([x, y], passOffset, pointIndex) => {
+        const wobbleSeed = seed * 17 + passOffset * 11 + pointIndex * 5;
+        const dx = Math.sin(wobbleSeed) * wobble * (passOffset === 0 ? 0.16 : 1);
+        const dy = Math.cos(wobbleSeed * 0.73) * wobble * (passOffset === 0 ? 0.1 : 0.72);
+        return [
+          transform.offsetX + (x + dx) * transform.scaleX,
+          transform.offsetY + (y + dy) * transform.scaleY
+        ];
+      };
+
+      targetCtx.save();
+      targetCtx.lineCap = "round";
+      targetCtx.lineJoin = "round";
+      passes.forEach((pass) => {
+        targetCtx.lineWidth = Math.max(1, baseWidth * pass.width);
+        targetCtx.globalAlpha = pass.alpha;
+        targetCtx.strokeStyle = baseStroke;
+        const [startX, startY] = mapPoint(object.start, pass.offset, 0);
+        targetCtx.beginPath();
+        targetCtx.moveTo(startX, startY);
+        object.segments.forEach((segment, index) => {
+          const [c1x, c1y] = mapPoint([segment[0], segment[1]], pass.offset, index * 3 + 1);
+          const [c2x, c2y] = mapPoint([segment[2], segment[3]], pass.offset, index * 3 + 2);
+          const [x, y] = mapPoint([segment[4], segment[5]], pass.offset, index * 3 + 3);
+          targetCtx.bezierCurveTo(c1x, c1y, c2x, c2y, x, y);
+        });
+        targetCtx.stroke();
+      });
+      targetCtx.restore();
+    }
+
     function fillBezierObject(targetCtx, object, transform) {
       const mapPoint = ([x, y]) => [
         transform.offsetX + x * transform.scaleX,
@@ -1188,6 +1113,87 @@
         else targetCtx.lineTo(mappedX, mappedY);
       });
       targetCtx.stroke();
+    }
+
+    function drawOrganicPolylineObject(targetCtx, points, transform, seed = 0) {
+      if (!points || points.length < 2) return;
+
+      const baseWidth = targetCtx.lineWidth;
+      const baseStroke = targetCtx.strokeStyle;
+      const passes = [
+        { offset: 0, width: 1.08, alpha: 0.92 },
+        { offset: 1, width: 0.68, alpha: 0.42 },
+        { offset: 2, width: 0.46, alpha: 0.32 },
+        { offset: 3, width: 0.28, alpha: 0.24 }
+      ];
+      const wobble = 7;
+
+      const mapPoint = ([x, y], passOffset, pointIndex) => {
+        const wobbleSeed = seed * 17 + passOffset * 11 + pointIndex * 5;
+        const dx = Math.sin(wobbleSeed) * wobble * (passOffset === 0 ? 0.16 : 1);
+        const dy = Math.cos(wobbleSeed * 0.73) * wobble * (passOffset === 0 ? 0.1 : 0.72);
+        return [
+          transform.offsetX + (x + dx) * transform.scaleX,
+          transform.offsetY + (y + dy) * transform.scaleY
+        ];
+      };
+
+      targetCtx.save();
+      targetCtx.lineCap = "round";
+      targetCtx.lineJoin = "round";
+      passes.forEach((pass) => {
+        targetCtx.lineWidth = Math.max(1, baseWidth * pass.width);
+        targetCtx.globalAlpha = pass.alpha;
+        targetCtx.strokeStyle = baseStroke;
+        targetCtx.beginPath();
+        points.forEach((point, index) => {
+          const [mappedX, mappedY] = mapPoint(point, pass.offset, index);
+          if (index === 0) targetCtx.moveTo(mappedX, mappedY);
+          else targetCtx.lineTo(mappedX, mappedY);
+        });
+        targetCtx.stroke();
+      });
+      targetCtx.restore();
+    }
+
+    function drawOrganicCanvasPolyline(targetCtx, points, seed = 0, options = {}) {
+      if (!points || points.length < 2) return;
+
+      const baseWidth = targetCtx.lineWidth;
+      const baseStroke = targetCtx.strokeStyle;
+      const smudge = options.smudge ?? 1;
+      const passes = [
+        { offset: 0, width: 1.08, alpha: 0.92 },
+        { offset: 1, width: 0.68, alpha: 0.42 },
+        { offset: 2, width: 0.46, alpha: 0.32 },
+        { offset: 3, width: 0.28, alpha: 0.24 },
+        { offset: 4, width: 0.34 * smudge, alpha: 0.12 * smudge }
+      ];
+      const wobble = 5 * smudge;
+
+      const mapPoint = ([x, y], passOffset, pointIndex) => {
+        const wobbleSeed = seed * 17 + passOffset * 11 + pointIndex * 5;
+        const dx = Math.sin(wobbleSeed) * wobble * (passOffset === 0 ? 0.12 : 1);
+        const dy = Math.cos(wobbleSeed * 0.73) * wobble * (passOffset === 0 ? 0.08 : 0.72);
+        return [x + dx, y + dy];
+      };
+
+      targetCtx.save();
+      targetCtx.lineCap = "round";
+      targetCtx.lineJoin = "round";
+      passes.forEach((pass) => {
+        targetCtx.lineWidth = Math.max(1, baseWidth * pass.width);
+        targetCtx.globalAlpha = pass.alpha;
+        targetCtx.strokeStyle = baseStroke;
+        targetCtx.beginPath();
+        points.forEach((point, index) => {
+          const [mappedX, mappedY] = mapPoint(point, pass.offset, index);
+          if (index === 0) targetCtx.moveTo(mappedX, mappedY);
+          else targetCtx.lineTo(mappedX, mappedY);
+        });
+        targetCtx.stroke();
+      });
+      targetCtx.restore();
     }
 
     function mapBezierObjectPoints(object, pointMapper) {
@@ -1286,7 +1292,7 @@
         ]
       };
     }
-    // Copyright 2026 Paul Hodara. Licensed under PolyForm Noncommercial 1.0.0.
+    // Copyright 2025 Paul Hodara All Rights Reserved
 
     function objectBounds(object) {
       const points = [object.start];
@@ -1361,9 +1367,76 @@
       };
     }
 
+    function createPyramidNoseObjects(noseDirection, noseBulb) {
+      const direction = clamp(noseDirection ?? 0, -1, 1);
+      const bulb = clamp(noseBulb ?? 0, -2, 2);
+      const tallNarrow = Math.max(0, -bulb);
+      const shortBulbous = Math.max(0, bulb);
+      const centerX = 260;
+      const noseOffsetY = -40;
+      const topY = 300 + noseOffsetY - tallNarrow * 38 + shortBulbous * 34;
+      const baseY = 612 + noseOffsetY - tallNarrow * 20 + shortBulbous * 24;
+      const tipY = 676 + noseOffsetY - tallNarrow * 34 + shortBulbous * 18;
+      const baseSpread = 46 - tallNarrow * 10 + shortBulbous * 28;
+      const tipReach = 58 - tallNarrow * 14 + shortBulbous * 18;
+      const bridgeControlY = 388 + noseOffsetY - tallNarrow * 22 + shortBulbous * 16;
+      const baseControlY = 536 + noseOffsetY - tallNarrow * 16 + shortBulbous * 26;
+      const bottomControlY = 642 + noseOffsetY - tallNarrow * 28 + shortBulbous * 22;
+      const top = [centerX, topY];
+      const leftBase = [centerX - baseSpread, baseY];
+      const rightBase = [centerX + baseSpread, baseY];
+      const forwardTip = [centerX + direction * tipReach, tipY];
+
+      return [
+        {
+          start: top,
+          segments: [
+            [
+              centerX - (18 + shortBulbous * 8 - tallNarrow * 4),
+              bridgeControlY,
+              leftBase[0] - 8,
+              baseControlY,
+              leftBase[0],
+              leftBase[1]
+            ],
+            [
+              leftBase[0] - 28,
+              bottomControlY,
+              forwardTip[0] - (54 + shortBulbous * 14 - tallNarrow * 10),
+              forwardTip[1] - 6,
+              forwardTip[0],
+              forwardTip[1]
+            ]
+          ]
+        },
+        {
+          start: top,
+          segments: [
+            [
+              centerX + (18 + shortBulbous * 8 - tallNarrow * 4),
+              bridgeControlY,
+              rightBase[0] + 8,
+              baseControlY,
+              rightBase[0],
+              rightBase[1]
+            ],
+            [
+              rightBase[0] + 28,
+              bottomControlY,
+              forwardTip[0] + (54 + shortBulbous * 14 - tallNarrow * 10),
+              forwardTip[1] - 6,
+              forwardTip[0],
+              forwardTip[1]
+            ]
+          ]
+        }
+      ];
+    }
+
     function createExpressionObjects() {
       const expression = resolveMouthExpression(currentExpression);
-      const noseShift = clamp(currentExpression.noseShift ?? 0, 0, 1);
+      const noseDirection = clamp(currentExpression.noseDirection ?? 0, -1, 1);
+      const noseBulb = clamp(currentExpression.noseBulb ?? 0, -2, 2);
       const morphValue = clamp(currentExpression.angryMouth ?? 0, 0, angryMouthMorphMax);
       const angryWaveMorph = clamp((morphValue - angryMouthMorphStart) / (angryMouthMorphMax - angryMouthMorphStart), 0, 1);
       const shapedMouthOpen = shapeMouthOpen(expression.mouthOpen);
@@ -1391,6 +1464,7 @@
       const mouthDownturnPx = softenedFrownAmount * 105;
       const mouthSmilePx = smileAmount * 118;
       const mouthLiftOffsetY = -expression.mouthLift * 10;
+      const mouthCurvePositionOffsetY = Math.pow(Math.max(0, expression.mouthCurve), 0.9) * 42;
 
       const adjustBrow = (object, isLeft) => transformObject(object, (point, bounds, role) => {
         const xNorm = bounds.maxX === bounds.minX ? 0 : (point[0] - bounds.centerX) / ((bounds.maxX - bounds.minX) / 2);
@@ -1437,52 +1511,22 @@
         const convergence = Math.min(18, lipDistance * 0.3) * softenedFrownAmount * mouthFormBlend;
         const convergenceOffset = isUpperLip ? convergence : -convergence;
         const sideDrop = edgeDrop + cornerBias;
-        const transformedY = bounds.centerY + dy * mouthScaleY * lipCompression + convergenceOffset + smileArc + sideDrop - centerLift + upperLipCrescent - smileCornerLift + smileCenterDip + mouthLiftOffsetY * 1.5;
+        const transformedY = bounds.centerY + dy * mouthScaleY * lipCompression + convergenceOffset + smileArc + sideDrop - centerLift + upperLipCrescent - smileCornerLift + smileCenterDip + mouthLiftOffsetY * 1.5 + mouthCurvePositionOffsetY;
         const closedCornerDrop = Math.pow(Math.abs(xNorm), 1.65) * mouthDownturnPx * 0.7 * closedMouthBlend;
         const closedCenterLift = (1 - Math.pow(Math.abs(xNorm), 1.1)) * mouthDownturnPx * 0.2 * closedMouthBlend;
         const closedSmileCornerLift = Math.pow(Math.abs(xNorm), 1.65) * mouthSmilePx * 1.08 * closedMouthBlend;
         const closedSmileCenterDip = (1 - Math.pow(Math.abs(xNorm), 1.08)) * mouthSmilePx * 0.24 * closedMouthBlend;
         const closedCurveArc = curveProfile * mouthCurvePx;
-        const flatLipY = bounds.centerY + mouthLiftOffsetY * 1.5 + closedCurveArc + closedCornerDrop - closedCenterLift - closedSmileCornerLift + closedSmileCenterDip;
+        const flatLipY = bounds.centerY + mouthLiftOffsetY * 1.5 + closedCurveArc + closedCornerDrop - closedCenterLift - closedSmileCornerLift + closedSmileCenterDip + mouthCurvePositionOffsetY;
         return [
           bounds.centerX + dx * mouthScaleX,
           lerp(flatLipY, transformedY, mouthFormBlend)
         ];
       });
 
-      const adjustNose = (object, sideSign) => transformObject(object, (point, bounds) => {
-        const narrowedX = sideSign > 0
-          ? bounds.centerX + (point[0] - bounds.centerX) * 0.8
-          : point[0] + 10;
-        return [
-          narrowedX,
-          point[1]
-        ];
-      });
-
       const leftEye = adjustEye(baseFaceObjects.leftEye, -1);
       const rightEye = adjustEye(baseFaceObjects.rightEye, 1);
-      const neutralLeftNose = adjustNose(baseFaceObjects.leftNose, -1);
-      const neutralRightNose = adjustNose(baseFaceObjects.rightNose, 1);
-      const leftNoseBounds = objectBounds(neutralLeftNose);
-      const rightNoseBounds = objectBounds(neutralRightNose);
-      const noseAxisX = (leftNoseBounds.maxX + rightNoseBounds.minX) / 2;
-      const noseAxisY = (
-        leftNoseBounds.centerY
-        + rightNoseBounds.centerY
-      ) / 2;
-      const leftNoseWidth = Math.max(1, noseAxisX - leftNoseBounds.minX);
-      const rightNoseWidth = Math.max(1, rightNoseBounds.maxX - noseAxisX);
-      const leftNoseHeight = Math.max(1, leftNoseBounds.maxY - leftNoseBounds.minY);
-      const rightNoseHeight = Math.max(1, rightNoseBounds.maxY - rightNoseBounds.minY);
-      const leftNoseScaleX = lerp(1, rightNoseWidth / leftNoseWidth, noseShift);
-      const rightNoseScaleX = lerp(1, leftNoseWidth / rightNoseWidth, noseShift);
-      const leftNoseScaleY = lerp(1, rightNoseHeight / leftNoseHeight, noseShift);
-      const rightNoseScaleY = lerp(1, leftNoseHeight / rightNoseHeight, noseShift);
-      const leftNoseScaled = scaleBezierObject(neutralLeftNose, noseAxisX, noseAxisY, leftNoseScaleX, leftNoseScaleY);
-      const rightNoseScaled = scaleBezierObject(neutralRightNose, noseAxisX, noseAxisY, rightNoseScaleX, rightNoseScaleY);
-      const leftNose = offsetBezierObject(leftNoseScaled, -25, noseAxisY - objectBounds(leftNoseScaled).centerY);
-      const rightNose = offsetBezierObject(rightNoseScaled, -25, noseAxisY - objectBounds(rightNoseScaled).centerY);
+      const noseLines = createPyramidNoseObjects(noseDirection, noseBulb);
       let mouth = offsetBezierObject(adjustMouth(baseFaceObjects.mouth), mouthOffsetX, 0);
       let mouthLine = null;
 
@@ -1537,8 +1581,7 @@
         rightEye,
         leftEyeGlobe: createEyeGlobeObject(leftEye, baseFaceObjects.leftEye, expression),
         rightEyeGlobe: createEyeGlobeObject(rightEye, baseFaceObjects.rightEye, expression),
-        leftNose,
-        rightNose,
+        noseLines,
         mouth,
         mouthLine,
         leftPupil: createPupilObject(leftEye, baseFaceObjects.leftEye, expression),
@@ -1577,13 +1620,14 @@
 
     function getFaceTransform() {
       const faceBounds = { x: 66, y: 123, w: 462, h: 677 };
+      const layoutHeight = Math.min(canvas.height, faceLayoutHeight);
       const availableW = canvas.width * 0.624;
-      const availableH = canvas.height * 0.624;
+      const availableH = layoutHeight * 0.624;
       const scale = Math.min(availableW / faceBounds.w, availableH / faceBounds.h);
       const width = faceBounds.w * scale;
       const height = faceBounds.h * scale;
       const offsetX = (canvas.width - width) / 2 - faceBounds.x * scale;
-      const offsetY = (canvas.height - height) / 2 - faceBounds.y * scale + faceOffsetY;
+      const offsetY = (layoutHeight - height) / 2 - faceBounds.y * scale + faceOffsetY;
       return { offsetX, offsetY, scaleX: scale, scaleY: scale };
     }
 
@@ -1598,18 +1642,29 @@
       ctx.fillStyle = "#ffffff";
 
       const faceObjects = createExpressionObjects();
-      drawBezierObject(ctx, faceObjects.leftBrow, transform);
-      drawBezierObject(ctx, faceObjects.rightBrow, transform);
-      drawBezierObject(ctx, faceObjects.leftEye, transform);
-      drawBezierObject(ctx, faceObjects.rightEye, transform);
+      ctx.save();
+      ctx.lineWidth = 9.5 * transform.scaleX;
+      drawOrganicBezierObject(ctx, faceObjects.leftBrow, transform, 18, { smudge: 1.55 });
+      drawOrganicBezierObject(ctx, faceObjects.rightBrow, transform, 19, { smudge: 1.55 });
+      ctx.restore();
+      drawOrganicBezierObject(ctx, faceObjects.leftEye, transform, 24);
+      drawOrganicBezierObject(ctx, faceObjects.rightEye, transform, 25);
       drawEyeGlobe(ctx, faceObjects.leftEyeGlobe, transform);
       drawEyeGlobe(ctx, faceObjects.rightEyeGlobe, transform);
       drawPupil(ctx, faceObjects.leftPupil, transform);
       drawPupil(ctx, faceObjects.rightPupil, transform);
-      drawBezierObject(ctx, faceObjects.leftNose, transform);
-      drawBezierObject(ctx, faceObjects.rightNose, transform);
-      if (faceObjects.mouthLine) drawPolylineObject(ctx, faceObjects.mouthLine, transform);
-      else drawBezierObject(ctx, faceObjects.mouth, transform);
+      ctx.save();
+      ctx.lineWidth = 9 * transform.scaleX;
+      faceObjects.noseLines.forEach((noseLine, index) => {
+        const organicSeed = 40 + index * 7;
+        drawOrganicBezierObject(ctx, noseLine, transform, organicSeed, { smudge: 1.35 });
+      });
+      ctx.restore();
+      ctx.save();
+      ctx.lineWidth = 9 * transform.scaleX;
+      if (faceObjects.mouthLine) drawOrganicPolylineObject(ctx, faceObjects.mouthLine, transform, 9);
+      else drawOrganicBezierObject(ctx, faceObjects.mouth, transform, 9);
+      ctx.restore();
       ctx.restore();
     }
 
@@ -1699,7 +1754,7 @@
 
       ctx.save();
       ctx.strokeStyle = "#f0c449";
-      ctx.lineWidth = 4;
+      ctx.lineWidth = 7;
       ctx.lineCap = "round";
 
       // Short wavy hair with 8 strands, expanded horizontally by 4× and centered on the eye centerline
@@ -1717,21 +1772,15 @@
       const topY = baseTopY - hairLength;
       for (let strand = 0; strand < numStrands; strand += 1) {
         const baseX = startX + strand * strandSpacing;
-        let prevX = baseX;
-        let prevY = scaleY(topY);
+        const points = [[baseX, scaleY(topY)]];
         for (let step = 1; step <= 5; step += 1) {
           const y = lerp(topY, baseBottomY, step / 5);
           const taper = step / 5;
           const phase = now * 3.5 + step * 0.55 + strand * 0.7;
           const x = baseX + Math.sin(phase) * (2.0 + taper * 1.5);
-          const drawY = scaleY(y);
-          ctx.beginPath();
-          ctx.moveTo(prevX, prevY);
-          ctx.lineTo(x, drawY);
-          ctx.stroke();
-          prevX = x;
-          prevY = drawY;
+          points.push([x, scaleY(y)]);
         }
+        drawOrganicCanvasPolyline(ctx, points, strand + 32, { smudge: 1.25 });
       }
 
       ctx.restore();
@@ -2216,6 +2265,6 @@
     setPreviewButtons(false);
     frame();
   </script>
-  <!-- Copyright 2026 Paul Hodara. Licensed under PolyForm Noncommercial 1.0.0. -->
+  <!-- Copyright 2025 Paul Hodara All Rights Reserved -->
 </body>
 </html>
