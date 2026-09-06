@@ -2510,8 +2510,15 @@
           downloadGifButton.textContent = "Download GIF";
         }, 900);
       } catch (error) {
+        if (error && error.name === "AbortError") {
+          downloadGifButton.textContent = "Share GIF";
+          return;
+        }
+
+        pendingAppleGifFile = null;
         if (error && error.name !== "AbortError") {
-          flashButtonLabel(downloadGifButton, "Try Again");
+          downloadBlob(file, file.name);
+          flashButtonLabel(downloadGifButton, "Downloaded");
         }
       } finally {
         downloadGifButton.disabled = false;
@@ -2529,7 +2536,7 @@
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 
-    function prepareApplePhotosSave(blob, filename) {
+    function prepareAppleGifShare(blob, filename) {
       if (!isAppleTouchDevice() || typeof File === "undefined") return false;
 
       const file = new File([blob], filename, { type: "image/gif" });
@@ -2537,7 +2544,7 @@
 
       pendingAppleGifFile = file;
       downloadGifButton.disabled = false;
-      downloadGifButton.textContent = "Save to Photos";
+      downloadGifButton.textContent = "Share GIF";
       return true;
     }
 
@@ -2599,7 +2606,7 @@
         }
 
         const blob = encodeGif(frames, gifWidth, gifHeight, 1000 / fps);
-        if (prepareApplePhotosSave(blob, filename)) return;
+        if (prepareAppleGifShare(blob, filename)) return;
 
         downloadBlob(blob, filename);
       } catch (error) {
