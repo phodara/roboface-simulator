@@ -93,6 +93,86 @@
       box-shadow: none;
     }
 
+    .site-menu {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 30;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .menu-toggle {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      background: var(--panel);
+      border: 3px solid var(--ink);
+      color: var(--ink);
+      box-shadow: 5px 5px 0 var(--ink);
+      cursor: pointer;
+    }
+
+    .menu-toggle:hover,
+    .menu-toggle:focus {
+      background: var(--yellow);
+      outline: none;
+    }
+
+    .menu-toggle span,
+    .menu-toggle::before,
+    .menu-toggle::after {
+      content: "";
+      display: block;
+      width: 22px;
+      height: 3px;
+      background: currentColor;
+      transition: transform .2s ease, opacity .2s ease;
+    }
+
+    .menu-toggle::before { transform: translateY(-7px); }
+    .menu-toggle::after { transform: translateY(7px); }
+
+    .site-menu[data-open="true"] .menu-toggle span { opacity: 0; }
+    .site-menu[data-open="true"] .menu-toggle::before { transform: translateY(3px) rotate(45deg); }
+    .site-menu[data-open="true"] .menu-toggle::after { transform: translateY(-3px) rotate(-45deg); }
+
+    .menu-panel {
+      position: absolute;
+      top: 58px;
+      left: 0;
+      width: min(280px, calc(100vw - 32px));
+      display: none;
+      gap: 8px;
+      padding: 12px;
+      background: var(--panel);
+      border: 3px solid var(--ink);
+      box-shadow: 8px 8px 0 var(--ink);
+    }
+
+    .site-menu[data-open="true"] .menu-panel {
+      display: grid;
+    }
+
+    .menu-panel a {
+      display: block;
+      padding: 12px 13px;
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .menu-panel a:hover,
+    .menu-panel a:focus {
+      background: var(--cyan);
+      outline: none;
+    }
+
     .header {
       display: flex;
       justify-content: space-between;
@@ -464,6 +544,7 @@
   </style>
 </head>
 <body>
+  <script src="assets/site-menu.js"></script>
   <main class="shell">
     <section class="stage">
       <canvas id="faceCanvas" width="720" height="1080" aria-label="Face simulator preview"></canvas>
